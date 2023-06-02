@@ -10,6 +10,7 @@ class Ingridient(models.Model):
     name = models.CharField(
         verbose_name='Название ингридиента',
         help_text='Содержит название ингридиента (макс 150 символов)',
+        unique=True,
         max_length=150,
     )
     measure = models.CharField(
@@ -17,7 +18,6 @@ class Ingridient(models.Model):
         help_text='Содержит единицы измерения ингридиента (макс 50 символов)',
         max_length=50,
     )
-
 
     class Meta:
         """Used to change a behavior of the Ingridient model fields."""
@@ -37,6 +37,7 @@ class Tag(models.Model):
     name = models.CharField(
         verbose_name='Название тэга',
         help_text='Содержит название тэга (макс 150 символов)',
+        unique=True,
         max_length=150,
     )
     color = models.CharField(
@@ -47,6 +48,7 @@ class Tag(models.Model):
     slug = models.SlugField(
         verbose_name='Тексты ссылки тэга',
         help_text='Содержит короткий текст для доступа к тэгу через url',
+        unique=True,
         max_length=50,
     )
 
@@ -62,40 +64,6 @@ class Tag(models.Model):
         return self.name
 
 
-class IngridientRecipe(models.Model):
-    """Describe a model which stores ingridient - recipe connection."""
-
-    ingridient = models.ForeignKey(
-        Ingridient,
-        on_delete=models.CASCADE(),
-    )
-    recipe = models.ForeignKey(
-        Ingridient,
-        on_delete=models.CASCADE(),
-    )
-    quantity = models.IntegerField(
-        verbose_name='Количество ингридиента',
-        help_text='Содержит количество ингридиента',
-    )
-
-    def __str__(self):
-        """Show a name of a tag."""
-        return f'{self.ingridient} {self.recipe}'
-
-
-class TagRecipe(models.Model):
-    """Describe a model which stores tag - recipe connection."""
-
-    tag = models.ForeignKey(
-        Ingridient,
-        on_delete=models.CASCADE(),
-    )
-    recipe = models.ForeignKey(
-        Ingridient,
-        on_delete=models.CASCADE(),
-    )
-
-
 class Recipe(models.Model):
     """Describe a model which stores recipes."""
 
@@ -104,7 +72,7 @@ class Recipe(models.Model):
         verbose_name='Автор рецепта',
         help_text='Содержит ссылку на автора рецепта',
         related_name='recipes',
-        on_delete=models.CASCADE(),
+        on_delete=models.CASCADE,
     )
     name = models.CharField(
         verbose_name='Название рецепта',
@@ -132,7 +100,7 @@ class Recipe(models.Model):
         help_text='Содержит список тэгов',
         through='TagRecipe',
     )
-    cooking_time = models.TimeField(
+    cooking_time = models.DurationField(
         verbose_name='Время приготовления',
         help_text='Содержит время приготовления рецепта',
     )
@@ -141,9 +109,55 @@ class Recipe(models.Model):
         """Used to change a behavior of the Tag model fields."""
 
         ordering = ('name',)
-        verbose_name = 'Тэг'
-        verbose_name_plural = 'Тэги'
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('name', 'author'),
+                name='unique_recipe',
+            ),
+        )
 
     def __str__(self):
         """Show a name of a tag."""
         return self.name
+
+
+class IngridientRecipe(models.Model):
+    """Describe a model which stores ingridient - recipe connection."""
+
+    ingridient = models.ForeignKey(
+        Ingridient,
+        on_delete=models.CASCADE,
+        related_name='ingridients',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipes',
+    )
+    quantity = models.IntegerField(
+        verbose_name='Количество ингридиента',
+        help_text='Содержит количество ингридиента',
+    )
+
+    def __str__(self):
+        """Show a ingridient - recipe chain."""
+        return f'{self.ingridient} {self.recipe}'
+
+
+class TagRecipe(models.Model):
+    """Describe a model which stores tag - recipe connection."""
+
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        """Show a tag - recipe chain."""
+        return f'{self.tag} {self.recipe}'
