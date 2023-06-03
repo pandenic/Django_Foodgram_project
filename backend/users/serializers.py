@@ -1,0 +1,33 @@
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+from recipes.models import Follow
+
+User = get_user_model()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """User model serializer."""
+
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        """Describe settings for UserSerializer."""
+
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+        )
+
+    def get_is_subscribed(self, obj):
+        """Check if current user follow this user."""
+        return Follow.objects.filter(
+            follower=self.context['request'].user,
+        ).filter(
+            following=obj.id,
+        ).exists()
