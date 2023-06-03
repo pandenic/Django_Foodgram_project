@@ -31,3 +31,10 @@ class UserSerializer(serializers.ModelSerializer):
         ).filter(
             following=obj.id,
         ).exists()
+
+    def validate(self, attrs):
+        """Validate serialized data of UserSerializer."""
+        for attr, value in attrs.items():
+            if not value:
+                raise serializers.ValidationError({attr: 'Обязательное поле.'})
+        return attrs
