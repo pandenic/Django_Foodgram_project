@@ -1,2 +1,12 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+
+
+class User(AbstractUser):
+    """Override the User model to change settings."""
+
+    class Meta:
+        """Change a behavior of the Ingridient model fields."""
+
+        ordering = ('username',)
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'

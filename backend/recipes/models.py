@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 User = get_user_model()
@@ -23,8 +24,8 @@ class Ingridient(models.Model):
         """Used to change a behavior of the Ingridient model fields."""
 
         ordering = ('name', 'measure')
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
+        verbose_name = 'Ingridient'
+        verbose_name_plural = 'Ingridients'
 
     def __str__(self):
         """Show a name of an ingridient."""
@@ -56,8 +57,8 @@ class Tag(models.Model):
         """Used to change a behavior of the Tag model fields."""
 
         ordering = ('name',)
-        verbose_name = 'Тэг'
-        verbose_name_plural = 'Тэги'
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
 
     def __str__(self):
         """Show a name of a tag."""
@@ -109,8 +110,8 @@ class Recipe(models.Model):
         """Used to change a behavior of the Tag model fields."""
 
         ordering = ('name',)
-        verbose_name = 'Рецепт'
-        verbose_name_plural = 'Рецепты'
+        verbose_name = 'Recipe'
+        verbose_name_plural = 'Recipes'
         constraints = (
             models.UniqueConstraint(
                 fields=('name', 'author'),

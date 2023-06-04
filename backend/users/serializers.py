@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         """Check if current user follow this user."""
         return Follow.objects.filter(
-            follower=self.context['request'].user,
+            follower=self.context['request'].user.id,
         ).filter(
             following=obj.id,
         ).exists()
