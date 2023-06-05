@@ -1,11 +1,14 @@
-FROM python:3.9
+FROM python:3.11-slim
 
 WORKDIR /app
-
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt --no-cache-dir
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y libpq-dev gcc netcat && \
+    pip install -U pip && \
+    pip install -r requirements.txt --no-cache-dir
 
 COPY . .
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "kittygram_backend.wsgi"]
+RUN chmod +x run_app.sh
+ENTRYPOINT ["/app/run_app.sh"]
