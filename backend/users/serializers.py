@@ -1,4 +1,6 @@
+"""Describe custom serializers for the users app."""
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
 from recipes.models import Follow
@@ -7,7 +9,7 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """User model serializer."""
+    """Serialize User model."""
 
     is_subscribed = serializers.SerializerMethodField()
 
