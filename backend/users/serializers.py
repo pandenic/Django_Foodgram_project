@@ -1,6 +1,5 @@
 """Describe custom serializers for the users app."""
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -10,7 +9,7 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Serialize User model."""
+    """Serialize User model on get request."""
 
     is_subscribed = serializers.SerializerMethodField()
     email = serializers.EmailField(
@@ -20,15 +19,15 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        """Describe settings for UserSerializer."""
+        """Describe settings for GetUserSerializer."""
 
         model = User
         fields = (
-            'email',
-            'id',
             'username',
+            'password',
             'first_name',
             'last_name',
+            'email',
             'is_subscribed',
         )
 
@@ -47,8 +46,20 @@ class UserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({attr: 'Обязательное поле.'})
         return attrs
 
+    def to_representation(self, data):
+        representation = {
+            'email': data.email,
+            'id': data.id,
+            'username': data.username,
+            'first_name': data.first_name,
+            'last_name': data.last_name,
+        }
+        if self.context['request'].method == 'POST':
+            representation['is_subscribed'] = self.is_subscribed
+        return representation
 
-class SetPasswordSerizlizer(serializers.Serializer):
+
+class SetPasswordSerializer(serializers.Serializer):
     """Serialize set password action."""
 
     new_password = serializers.CharField(max_length=150)
@@ -56,8 +67,9 @@ class SetPasswordSerizlizer(serializers.Serializer):
 
     def validate_current_password(self, value):
         """Check if current password is correct."""
-        if not self.context['request'].user.check_password(self.current_password):
-            raise serializers.ValidationError('Пароль неверный')
+        user = self.context['request'].user
+        if not user.check_password(self.current_password):
+            raise serializers.ValidationError({'current_password': 'Пароль неверный'})
         return value
 
 
@@ -67,11 +79,4 @@ class GetTokenSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=150)
     email = serializers.EmailField()
 
-    def validate(self, attrs):
-        """Check if password and email are correct."""
-        email = attrs['email']
-        user = get_object_or_404(User, email=email)
-        if not user.check_password(attrs['password']):
-            raise serializers.ValidationError('Пароль неверный')
-        return attrs
 
