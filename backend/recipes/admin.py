@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from recipes.models import Recipe, Tag, Ingridient
+from recipes.models import Recipe, Tag, Ingredient
 
 
 @admin.register(Recipe)
@@ -45,7 +45,7 @@ class TagAdmin(admin.ModelAdmin):
     list_display_links = None
 
 
-@admin.register(Ingridient)
+@admin.register(Ingredient)
 class IngridientAdmin(admin.ModelAdmin):
     """Admin panel settings for Tag model."""
 

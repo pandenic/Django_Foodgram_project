@@ -2,11 +2,12 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework import status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.mixins import ListCreateViewSet
-from users.serializers import UserSerializer, SetPasswordSerizlizer
+from users.serializers import UserSerializer, SetPasswordSerizlizer, GetTokenSerializer
 from users.pagination import UserPagination
 
 User = get_user_model()
@@ -26,14 +27,25 @@ class UserViewSet(ListCreateViewSet):
     def me(self, request):
         """Process './me' endpoint."""
         serializer = UserSerializer(request.user)
-        if serializer.validated_data:
-            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=status.HTTP_204_NO_CONTENT)
 
     def set_password(self, request):
         """Process './set_password' endpoint."""
         serializer = SetPasswordSerizlizer
-        if request.user.check_password(serializer.validated_data['current_password']):
-            request.user.set_password(serializer.validated_data['new_password'])
+        serializer.is_valid(raise_exception=True)
+        request.user.set_password(serializer.validated_data['new_password'])
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@api_view(('POST',))
+def get_token(request):
+    """An obtain token function."""
+    serializer = GetTokenSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    token = RefreshToken.for_user(request.user)
+
+    return Response(
+        {"auth_token": str(token.access_token)},
+        status=status.HTTP_201_CREATED,
+    )

@@ -1,7 +1,8 @@
 """Describe custom serializers for the users app."""
 from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import check_password
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from recipes.models import Follow
 
@@ -12,6 +13,11 @@ class UserSerializer(serializers.ModelSerializer):
     """Serialize User model."""
 
     is_subscribed = serializers.SerializerMethodField()
+    email = serializers.EmailField(
+        required=True,
+        validators=(UniqueValidator(queryset=User.objects.all()),),
+        max_length=254,
+    )
 
     class Meta:
         """Describe settings for UserSerializer."""
@@ -47,3 +53,25 @@ class SetPasswordSerizlizer(serializers.Serializer):
 
     new_password = serializers.CharField(max_length=150)
     current_password = serializers.CharField(max_length=150)
+
+    def validate_current_password(self, value):
+        """Check if current password is correct."""
+        if not self.context['request'].user.check_password(self.current_password):
+            raise serializers.ValidationError('Пароль неверный')
+        return value
+
+
+class GetTokenSerializer(serializers.Serializer):
+    """Serialize token obtain."""
+
+    password = serializers.CharField(max_length=150)
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        """Check if password and email are correct."""
+        email = attrs['email']
+        user = get_object_or_404(User, email=email)
+        if not user.check_password(attrs['password']):
+            raise serializers.ValidationError('Пароль неверный')
+        return attrs
+

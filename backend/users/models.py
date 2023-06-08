@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     """Override the User model to change settings."""
 
+
+
     class Meta:
         """Change a behavior of the Ingridient model fields."""
 
