@@ -40,3 +40,10 @@ class UserSerializer(serializers.ModelSerializer):
             if not value:
                 raise serializers.ValidationError({attr: 'Обязательное поле.'})
         return attrs
+
+
+class SetPasswordSerizlizer(serializers.Serializer):
+    """Serialize set password action."""
+
+    new_password = serializers.CharField(max_length=150)
+    current_password = serializers.CharField(max_length=150)
