@@ -13,7 +13,7 @@ router.register(
 )
 
 token = [
-    path('login', get_token, name='token_obtain'),
+    path('login/', get_token, name='token_obtain'),
 ]
 
 urlpatterns = (

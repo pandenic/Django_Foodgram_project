@@ -1,6 +1,5 @@
 """Describe custom serializers for the users app."""
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -9,8 +8,8 @@ from recipes.models import Follow
 User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
-    """Serialize User model."""
+class GetUserSerializer(serializers.ModelSerializer):
+    """Serialize User model on get request."""
 
     is_subscribed = serializers.SerializerMethodField()
     email = serializers.EmailField(
@@ -20,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        """Describe settings for UserSerializer."""
+        """Describe settings for GetUserSerializer."""
 
         model = User
         fields = (
@@ -48,6 +47,31 @@ class UserSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class PostUserSerializer(serializers.ModelSerializer):
+    """Serialize User model on post request."""
+
+    class Meta:
+        """Describe settings for PostUserSerializer."""
+
+        model = User
+        fields = (
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+            'password',
+        )
+
+        def to_representation(self, data):
+            return {
+                'email': data.email,
+                'id': data.id,
+                'first_name': data.first_name,
+                'last_name': data.last_name,
+                'password': data.password,
+            }
+
+
 class SetPasswordSerizlizer(serializers.Serializer):
     """Serialize set password action."""
 
@@ -67,11 +91,4 @@ class GetTokenSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=150)
     email = serializers.EmailField()
 
-    def validate(self, attrs):
-        """Check if password and email are correct."""
-        email = attrs['email']
-        user = get_object_or_404(User, email=email)
-        if not user.check_password(attrs['password']):
-            raise serializers.ValidationError('Пароль неверный')
-        return attrs
 
