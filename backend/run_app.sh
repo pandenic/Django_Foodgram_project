@@ -1,4 +1,4 @@
-cd foodgram || exit
+#!/bin/bash
 python manage.py migrate;
 python manage.py collectstatic --noinput;
-gunicorn --bind 0.0.0.0:8000 foodgram.wsgi;
+gunicorn --bind 0:8000 foodgram.wsgi;
