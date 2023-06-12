@@ -5,12 +5,13 @@ from django.db import models
 User = get_user_model()
 
 
-class Ingredient(models.Model):
-    """Describe a model which stores information about ingredients."""
+class Ingridient(models.Model):
+    """Describe a model which stores information about ingridients."""
 
     name = models.CharField(
         verbose_name='Название ингридиента',
         help_text='Содержит название ингридиента (макс 150 символов)',
+        unique=True,
         max_length=150,
     )
     measure = models.CharField(
@@ -20,14 +21,14 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        """Used to change a behavior of the Ingredient model fields."""
+        """Used to change a behavior of the Ingridient model fields."""
 
         ordering = ('name', 'measure')
-        verbose_name = 'Ingredient'
-        verbose_name_plural = 'Ingredients'
+        verbose_name = 'Ingridient'
+        verbose_name_plural = 'Ingridients'
 
     def __str__(self):
-        """Show a name of an ingredient."""
+        """Show a name of an ingridient."""
         return self.name
 
 
@@ -88,11 +89,11 @@ class Recipe(models.Model):
         verbose_name='Описание рецепта',
         help_text='Содержит описание рецепта',
     )
-    ingredients = models.ManyToManyField(
-        Ingredient,
+    ingridients = models.ManyToManyField(
+        Ingridient,
         verbose_name='Ингридиенты',
         help_text='Содержит список ингридиентов',
-        through='IngredientRecipe',
+        through='IngridientRecipe',
     )
     tags = models.ManyToManyField(
         Tag,
@@ -123,13 +124,13 @@ class Recipe(models.Model):
         return self.name
 
 
-class IngredientRecipe(models.Model):
-    """Describe a model which stores ingredient - recipe connection."""
+class IngridientRecipe(models.Model):
+    """Describe a model which stores ingridient - recipe connection."""
 
-    ingredient = models.ForeignKey(
-        Ingredient,
+    ingridient = models.ForeignKey(
+        Ingridient,
         on_delete=models.CASCADE,
-        related_name='ingredients',
+        related_name='ingridients',
     )
     recipe = models.ForeignKey(
         Recipe,
@@ -142,8 +143,8 @@ class IngredientRecipe(models.Model):
     )
 
     def __str__(self):
-        """Show a ingredient - recipe chain."""
-        return f'{self.ingredient} {self.recipe}'
+        """Show a ingridient - recipe chain."""
+        return f'{self.ingridient} {self.recipe}'
 
 
 class TagRecipe(models.Model):
