@@ -28,7 +28,7 @@ services:
     volumes:
       - static:/app/collected_static/
       - media:/app/media/
-      - ../backend:/app
+      - ../backend/foodgram:/app/foodgram
     ports:
       - "8000:8000"
     depends_on:

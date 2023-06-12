@@ -1,4 +1,4 @@
-"""Describe custom pagination classes for users app."""
+"""Describe custom pagination classes."""
 from rest_framework.pagination import PageNumberPagination
 
 
