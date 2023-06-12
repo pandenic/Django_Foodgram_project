@@ -180,3 +180,42 @@ class Follow(models.Model):
         on_delete=models.CASCADE,
         related_name='followings',
     )
+
+
+class Favorite(models.Model):
+    """Describe a model which stores favorited recipes for a certain user."""
+
+    favorite_recipe = models.ForeignKey(
+        Recipe,
+        verbose_name='Favorite recipe',
+        help_text='Recipe which favorited by a certain user',
+        on_delete=models.CASCADE,
+        related_name='favorited_by',
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name='User',
+        help_text='User who favorited a recipe',
+        on_delete=models.CASCADE,
+        related_name='favorites',
+    )
+
+
+class ShoppingCart(models.Model):
+    """Describe a model which stores favorited recipes for a certain user."""
+
+    recipe_in_cart = models.ForeignKey(
+        Recipe,
+        verbose_name='Recipe in cart',
+        help_text='Recipe which added to cart by a certain user',
+        on_delete=models.CASCADE,
+        related_name='added_to_cart',
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name='User',
+        help_text='User who added recipes to a cart',
+        on_delete=models.CASCADE,
+        related_name='cart',
+    )
+
