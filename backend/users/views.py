@@ -3,11 +3,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password, check_password
 from django.shortcuts import get_object_or_404
 
-from rest_framework import status, permissions, serializers
+from rest_framework import status, permissions
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.mixins import ListCreateViewSet
 from users.serializers import GetUserSerializer, PostUserSerializer, SetPasswordSerializer, GetTokenSerializer
@@ -22,6 +22,7 @@ class UserViewSet(ListCreateViewSet):
     queryset = User.objects.all()
     serializer_class = GetUserSerializer
     pagination_class = UserPagination
+    permission_classes = (permissions.AllowAny,)
 
     @action(
         ('get',),
@@ -31,7 +32,7 @@ class UserViewSet(ListCreateViewSet):
     def me(self, request):
         """Process './me' endpoint."""
         serializer = GetUserSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         ('post',),
@@ -46,7 +47,12 @@ class UserViewSet(ListCreateViewSet):
             context={'request': request},
         )
         serializer.is_valid(raise_exception=True)
-        request.user.set_password(serializer.validated_data['new_password'])
+        serializer.save(
+            password=make_password(
+                serializer.validated_data['new_password']
+            )
+        )
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def perform_create(self, serializer):
@@ -65,19 +71,33 @@ class UserViewSet(ListCreateViewSet):
 @api_view(('POST',))
 @permission_classes((AllowAny,))
 def get_token(request):
-    """Obtain token for processing."""
+    """Obtain token for user."""
     serializer = GetTokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
     email = serializer.validated_data['email']
-    password = serializer.validated_data['password']
     user = get_object_or_404(User, email=email)
 
+    password = serializer.validated_data['password']
     if not check_password(password, user.password):
-        raise serializers.ValidationError({'password': f'Пароль неверный'})
+        return Response(
+            {'password': 'Пароль неверный'},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
-    token = RefreshToken.for_user(user)
+    token = Token.objects.create(user=user)
+
     return Response(
-        {"auth_token": str(token.access_token)},
+        {'auth_token': str(token.key)},
         status=status.HTTP_201_CREATED,
     )
+
+
+@api_view(('POST',))
+@permission_classes((permissions.IsAuthenticated,))
+def delete_token(request):
+    """Delete token for user."""
+
+    token = get_object_or_404(Token, user=request.user)
+    token.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

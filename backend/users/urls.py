@@ -3,7 +3,7 @@ from django.urls import path, include
 
 from rest_framework import routers
 
-from users.views import UserViewSet, get_token
+from users.views import UserViewSet, get_token, delete_token
 
 router = routers.SimpleRouter()
 router.register(
@@ -14,6 +14,7 @@ router.register(
 
 token = [
     path('login/', get_token, name='token_obtain'),
+    path('logout/', delete_token, name='token_deletion'),
 ]
 
 urlpatterns = (

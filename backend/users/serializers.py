@@ -82,11 +82,23 @@ class PostUserSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class SetPasswordSerializer(serializers.Serializer):
+class SetPasswordSerializer(serializers.ModelSerializer):
     """Serialize set password action."""
 
     new_password = serializers.CharField(max_length=150)
-    current_password = serializers.CharField(max_length=150)
+    current_password = serializers.CharField(
+        source='password',
+        max_length=150,
+    )
+
+    class Meta:
+        """Describe settings for SetPasswordSerializer."""
+
+        model = User
+        fields = (
+            'new_password',
+            'current_password',
+        )
 
     def validate_current_password(self, value):
         """Check if current password is correct."""
@@ -101,5 +113,4 @@ class GetTokenSerializer(serializers.Serializer):
 
     password = serializers.CharField(max_length=150)
     email = serializers.EmailField()
-
 
