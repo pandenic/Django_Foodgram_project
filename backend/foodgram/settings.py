@@ -3,6 +3,10 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -21,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
     'users.apps.UsersConfig',
     'recipes.apps.RecipesConfig',
     'shopping_cart.apps.ShoppingCartConfig',
@@ -57,22 +61,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': os.getenv(
-            'DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': os.getenv(
-            'POSTGRES_DB', default='postgres'),
-        'USER': os.getenv(
-            'POSTGRES_USER', default='postgres'),
-        'PASSWORD': os.getenv(
-            'POSTGRES_PASSWORD', default='postgres'),
-        'HOST': os.getenv(
-            'DB_HOST', default='127.0.0.1'),
-        'PORT': os.getenv(
-            'DB_PORT', default=5432),
+if DEBUG:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        },
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': os.getenv(
+                'DB_ENGINE', default='django.db.backends.postgresql'),
+            'NAME': os.getenv(
+                'POSTGRES_DB', default='postgres'),
+            'USER': os.getenv(
+                'POSTGRES_USER', default='postgres'),
+            'PASSWORD': os.getenv(
+                'POSTGRES_PASSWORD', default='postgres'),
+            'HOST': os.getenv(
+                'DB_HOST', default='127.0.0.1'),
+            'PORT': os.getenv(
+                'DB_PORT', default=5432),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -102,24 +114,15 @@ STATIC_ROOT = BASE_DIR / 'collected_static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+AUTH_USER_MODEL = 'users.User'
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
-    'PAGE_SIZE': 5,
-}
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    "AUTH_HEADER_TYPES": ("Token",),
-}
-
-REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
 }
-
-AUTH_USER_MODEL = 'users.User'

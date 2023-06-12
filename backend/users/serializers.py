@@ -1,6 +1,6 @@
 """Describe custom serializers for the users app."""
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -9,8 +9,8 @@ from recipes.models import Follow
 User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
-    """Serialize User model."""
+class GetUserSerializer(serializers.ModelSerializer):
+    """Serialize User model on get request."""
 
     is_subscribed = serializers.SerializerMethodField()
     email = serializers.EmailField(
@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        """Describe settings for UserSerializer."""
+        """Describe settings for GetUserSerializer."""
 
         model = User
         fields = (
@@ -34,11 +34,45 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         """Check if current user follow this user."""
-        return Follow.objects.filter(
-            follower=self.context['request'].user.id,
-        ).filter(
-            following=obj.id,
-        ).exists()
+        request = self.context.get('request')
+        if request:
+            return Follow.objects.filter(
+                follower=request.user.id,
+            ).filter(
+                following=obj.id,
+            ).exists()
+        return False
+
+
+class PostUserSerializer(serializers.ModelSerializer):
+    """Serialize User model on post request."""
+
+    email = serializers.EmailField(
+        required=True,
+        validators=(UniqueValidator(queryset=User.objects.all()),),
+        max_length=254,
+    )
+
+    class Meta:
+        """Describe settings for PostUserSerializer."""
+
+        model = User
+        fields = (
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+            'password',
+        )
+
+    def to_representation(self, data):
+        return {
+            'email': data.email,
+            'id': data.id,
+            'username': data.username,
+            'first_name': data.first_name,
+            'last_name': data.last_name,
+        }
 
     def validate(self, attrs):
         """Validate serialized data of UserSerializer."""
@@ -48,16 +82,29 @@ class UserSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class SetPasswordSerizlizer(serializers.Serializer):
+class SetPasswordSerializer(serializers.ModelSerializer):
     """Serialize set password action."""
 
     new_password = serializers.CharField(max_length=150)
-    current_password = serializers.CharField(max_length=150)
+    current_password = serializers.CharField(
+        source='password',
+        max_length=150,
+    )
+
+    class Meta:
+        """Describe settings for SetPasswordSerializer."""
+
+        model = User
+        fields = (
+            'new_password',
+            'current_password',
+        )
 
     def validate_current_password(self, value):
         """Check if current password is correct."""
-        if not self.context['request'].user.check_password(self.current_password):
-            raise serializers.ValidationError('Пароль неверный')
+        user = self.context['request'].user
+        if not check_password(value, user.password):
+            raise serializers.ValidationError({'current_password': 'Пароль неверный'})
         return value
 
 
@@ -66,12 +113,4 @@ class GetTokenSerializer(serializers.Serializer):
 
     password = serializers.CharField(max_length=150)
     email = serializers.EmailField()
-
-    def validate(self, attrs):
-        """Check if password and email are correct."""
-        email = attrs['email']
-        user = get_object_or_404(User, email=email)
-        if not user.check_password(attrs['password']):
-            raise serializers.ValidationError('Пароль неверный')
-        return attrs
 
