@@ -17,7 +17,7 @@ User = get_user_model()
 
 
 class UserViewSet(ListCreateViewSet):
-    """Perform CRUD operations for User model."""
+    """Perform GET and POST operations for User model."""
 
     queryset = User.objects.all()
     serializer_class = GetUserSerializer
