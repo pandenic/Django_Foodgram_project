@@ -1,6 +1,7 @@
 """Describe custom serializers for the users app."""
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -10,7 +11,7 @@ User = get_user_model()
 
 
 class GetUserSerializer(serializers.ModelSerializer):
-    """Serialize User model on get request."""
+    """Serialize get request for User model."""
 
     is_subscribed = serializers.SerializerMethodField()
     email = serializers.EmailField(
@@ -113,4 +114,3 @@ class GetTokenSerializer(serializers.Serializer):
 
     password = serializers.CharField(max_length=150)
     email = serializers.EmailField()
-

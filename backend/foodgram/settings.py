@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'users.apps.UsersConfig',
     'recipes.apps.RecipesConfig',
-    'shopping_cart.apps.ShoppingCartConfig',
 ]
 
 MIDDLEWARE = [
