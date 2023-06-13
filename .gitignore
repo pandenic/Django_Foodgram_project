@@ -134,3 +134,6 @@ dmypy.json
 
 # requests files
 *.http
+
+# staticfiles
+collected_static/

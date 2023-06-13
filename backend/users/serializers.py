@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from recipes.models import Follow
+from users.models import Follow
 
 User = get_user_model()
 

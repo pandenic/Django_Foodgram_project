@@ -9,7 +9,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from users.mixins import ListCreateViewSet
+from users.mixins import ListCreateViewSet, ListViewSet
 from users.serializers import GetUserSerializer, PostUserSerializer, SetPasswordSerializer, GetTokenSerializer
 from users.pagination import UserPagination
 
@@ -97,7 +97,16 @@ def get_token(request):
 @permission_classes((permissions.IsAuthenticated,))
 def delete_token(request):
     """Delete token for user."""
-
     token = get_object_or_404(Token, user=request.user)
     token.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SubscriptionViewSet(ListViewSet):
+    """Show subscriptions for a certain user."""
+
+    def get_queryset(self):
+        """Define queryset for a certain user."""
+        pass
+
+

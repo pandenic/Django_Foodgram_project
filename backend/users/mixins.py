@@ -10,3 +10,12 @@ class ListCreateViewSet(
     """Describe a custom ViewSet for List and Create methods."""
 
     pass
+
+
+class ListViewSet(
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Describe a custom ViewSet for a List method."""
+
+    pass
