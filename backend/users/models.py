@@ -30,3 +30,15 @@ class Follow(models.Model):
         on_delete=models.CASCADE,
         related_name='followings',
     )
+
+    class Meta:
+        """Change a behavior of the Follow model fields."""
+
+        ordering = ('follower',)
+        verbose_name = 'Follow'
+        verbose_name_plural = 'Follows'
+
+    def __str__(self):
+        """Show a follow - follower chain."""
+        return f'{self.follower} follow {self.following}'
+

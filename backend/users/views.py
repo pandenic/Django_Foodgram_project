@@ -101,12 +101,15 @@ def delete_token(request):
     token.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-
+'''
 class SubscriptionViewSet(ListViewSet):
     """Show subscriptions for a certain user."""
 
+    pagination_class = UserPagination
+
     def get_queryset(self):
         """Define queryset for a certain user."""
-        pass
+        return User.objects.all(followers__follower=self.request.user)
+'''
 
 

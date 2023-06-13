@@ -181,6 +181,17 @@ class Favorite(models.Model):
         related_name='favorites',
     )
 
+    class Meta:
+        """Used to change a behavior of the Favorite model fields."""
+
+        ordering = ('user', 'favorite_recipe')
+        verbose_name = 'Favorite'
+        verbose_name_plural = 'Favorites'
+
+    def __str__(self):
+        """Show a favorite recipe for a certain user."""
+        return f'Recipe {self.favorite_recipe} favorited by {self.user}'
+
 
 class ShoppingCart(models.Model):
     """Describe a model which stores favorited recipes for a certain user."""
@@ -200,3 +211,13 @@ class ShoppingCart(models.Model):
         related_name='cart',
     )
 
+    class Meta:
+        """Used to change a behavior of the ShoppingCart model fields."""
+
+        ordering = ('user', 'recipe_in_cart')
+        verbose_name = 'Shopping cart'
+        verbose_name_plural = 'Shopping carts'
+
+    def __str__(self):
+        """Show a tag - recipe chain."""
+        return f'Recipe {self.favorite_recipe} in shopping cart for {self.user}'

@@ -114,3 +114,23 @@ class GetTokenSerializer(serializers.Serializer):
 
     password = serializers.CharField(max_length=150)
     email = serializers.EmailField()
+
+'''
+class SubscriptionSerializer(GetUserSerializer):
+    """Serialize subscription process."""
+
+    class Meta:
+        """Describe settings for SubscriptionSerializer."""
+
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count',
+        )
+'''
