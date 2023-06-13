@@ -1,9 +1,8 @@
 """Describe custom views for the recipe app."""
 from rest_framework import permissions, viewsets
 
-from recipes.models import Tag, Recipe
-from recipes.serializers import TagSerializer
-from users.serializers import RecipeSerializer
+from recipes.models import Tag, Recipe, Ingredient
+from recipes.serializers import TagSerializer, IngredientSerializer
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -15,8 +14,10 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-class RecipeViewSet(viewsets.ModelViewSet):
-    """Perform CRUD operations for Recipe model."""
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    """Perform GET operations for Ingredients model."""
 
-    queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    permission_classes = (permissions.AllowAny,)
+    pagination_class = None

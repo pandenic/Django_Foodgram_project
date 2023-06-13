@@ -13,7 +13,7 @@ class Ingredient(models.Model):
         help_text='Содержит название ингридиента (макс 150 символов)',
         max_length=150,
     )
-    measure = models.CharField(
+    measurement_unit = models.CharField(
         verbose_name='Единицы измерения ингридиента',
         help_text='Содержит единицы измерения ингридиента (макс 50 символов)',
         max_length=50,
@@ -22,7 +22,7 @@ class Ingredient(models.Model):
     class Meta:
         """Used to change a behavior of the Ingredient model fields."""
 
-        ordering = ('name', 'measure')
+        ordering = ('name', 'measurement_unit')
         verbose_name = 'Ingredient'
         verbose_name_plural = 'Ingredients'
 
