@@ -51,10 +51,10 @@ class IngredientAdmin(admin.ModelAdmin):
 
     list_display = (
         'name',
-        'measure',
+        'measurement_unit',
     )
     search_fields = list_display
-    list_filter = ('measure',)
+    list_filter = ('measurement_unit',)
     empty_value_display = '-empty-'
     list_editable = list_display
     list_display_links = None
