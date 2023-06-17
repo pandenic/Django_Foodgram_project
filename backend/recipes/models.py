@@ -83,6 +83,7 @@ class Recipe(models.Model):
         verbose_name='Фото рецепта',
         help_text='Содержит фото рецепта',
         upload_to='recipes/media/',
+        blank=True,
     )
     description = models.TextField(
         verbose_name='Описание рецепта',
@@ -93,14 +94,16 @@ class Recipe(models.Model):
         verbose_name='Ингридиенты',
         help_text='Содержит список ингридиентов',
         through='IngredientRecipe',
+        blank=True,
     )
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Тэги',
         help_text='Содержит список тэгов',
         through='TagRecipe',
+        blank=True,
     )
-    cooking_time = models.DurationField(
+    cooking_time = models.IntegerField(
         verbose_name='Время приготовления',
         help_text='Содержит время приготовления рецепта',
     )
@@ -111,12 +114,6 @@ class Recipe(models.Model):
         ordering = ('name',)
         verbose_name = 'Recipe'
         verbose_name_plural = 'Recipes'
-        constraints = (
-            models.UniqueConstraint(
-                fields=('name', 'author'),
-                name='unique_recipe',
-            ),
-        )
 
     def __str__(self):
         """Show a name of a tag."""

@@ -67,6 +67,7 @@ class PostUserSerializer(serializers.ModelSerializer):
         )
 
     def to_representation(self, data):
+        """Define representation of PostUserSerializer."""
         return {
             'email': data.email,
             'id': data.id,
@@ -114,6 +115,7 @@ class GetTokenSerializer(serializers.Serializer):
 
     password = serializers.CharField(max_length=150)
     email = serializers.EmailField()
+
 
 '''
 class SubscriptionSerializer(GetUserSerializer):

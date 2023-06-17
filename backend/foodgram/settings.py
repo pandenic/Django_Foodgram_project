@@ -5,13 +5,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'django-insecure-#qxm0v16w7@&vg8b1n6#lb=9y7#p0#@ermd1wot5)ajqn6^oos' # os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv(
-    'DEBUG', default=False)
+    'DEBUG', default=True)
 
 ALLOWED_HOSTS = [os.getenv(
-    'ALLOWED_HOSTS', default='127.0.0.1')]
+    'ALLOWED_HOSTS', default='*')]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'users.apps.UsersConfig',
     'recipes.apps.RecipesConfig',
 ]
@@ -56,30 +57,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-'''
-    from dotenv import load_dotenv
-    load_dotenv()
-    
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        },
-    }
-'''
-
 DATABASES = {
     'default': {
         'ENGINE': os.getenv(
             'DB_ENGINE', default='django.db.backends.postgresql'),
         'NAME': os.getenv(
-            'POSTGRES_DB', default='postgres'),
+            'POSTGRES_DB', default='foodgram_postgres'),
         'USER': os.getenv(
             'POSTGRES_USER', default='postgres'),
         'PASSWORD': os.getenv(
             'POSTGRES_PASSWORD', default='postgres'),
         'HOST': os.getenv(
-            'DB_HOST', default='127.0.0.1'),
+            'DB_HOST', default='localhost'),
         'PORT': os.getenv(
             'DB_PORT', default=5432),
     }
