@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator
 from django.db import models
 
 User = get_user_model()
@@ -126,16 +127,16 @@ class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredients',
+        related_name='recipes',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipes',
     )
     quantity = models.IntegerField(
         verbose_name='Количество ингридиента',
         help_text='Содержит количество ингридиента',
+        validators=[MinValueValidator(0)]
     )
 
     def __str__(self):

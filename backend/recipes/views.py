@@ -1,10 +1,11 @@
 """Describe custom views for the recipe app."""
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, viewsets
+from rest_framework.response import Response
 
 from recipes.models import Tag, Recipe, Ingredient
 from recipes.pagination import RecipePagination
-from recipes.serializers import TagSerializer, IngredientSerializer, GetRecipeSerializer, PostRecipeSerializer
+from recipes.serializers import TagSerializer, IngredientSerializer, RecipeSerializer
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -30,6 +31,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     queryset = Recipe.objects.all()
     pagination_class = RecipePagination
+    serializer_class = RecipeSerializer
     '''
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('is_favorited', 'is_in_shopping_cart', 'author', 'tags')'''
@@ -39,9 +41,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(
             author=self.request.user,
         )
-
+'''
     def get_serializer_class(self):
         """Choose serializer class depend on method."""
         if self.action in ('list', 'retrieve'):
             return GetRecipeSerializer
         return PostRecipeSerializer
+'''
