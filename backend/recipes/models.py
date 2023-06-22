@@ -83,7 +83,7 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name='Фото рецепта',
         help_text='Содержит фото рецепта',
-        upload_to='recipes/media/',
+        upload_to='media/',
         blank=True,
     )
     description = models.TextField(
@@ -130,11 +130,12 @@ class IngredientRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
+        related_name='ingredient_recipe',
     )
     quantity = models.IntegerField(
         verbose_name='Количество ингридиента',
         help_text='Содержит количество ингридиента',
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(0)],
     )
 
     def __str__(self):

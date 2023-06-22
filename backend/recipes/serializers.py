@@ -1,6 +1,5 @@
 """Describe custom serializers for the recipes app."""
 import base64
-from collections import OrderedDict
 
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
@@ -91,7 +90,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
     """Serialize GET request for Recipe model."""
 
     tags = TagSerializer(many=True, read_only=True)
-    ingredients = IngredientSerializer(many=True, read_only=True)
+    ingredients = serializers.SerializerMethodField()
     author = GetUserSerializer(read_only=True)
     text = serializers.CharField(source='description')
     is_favorited = serializers.SerializerMethodField()
@@ -107,7 +106,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
             'name',
-            # 'image',
+            #'image',
             'text',
             'cooking_time',
         )
@@ -134,6 +133,13 @@ class GetRecipeSerializer(serializers.ModelSerializer):
             ).exists()
         return False
 
+    def get_ingredients(self, obj):
+        return IngredientSerializer(
+            obj.ingredients.all(),
+            many=True,
+            context={'current_recipe_id': obj.id}
+        ).data
+
 
 class PostRecipeSerializer(serializers.ModelSerializer):
     """Serialize POST request for Recipe model."""
@@ -144,8 +150,9 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         many=True,
         queryset=Tag.objects.all()
     )
-    ingredients = IngredientRecipeSerializer(many=True, required=True)
+    ingredients = IngredientRecipeSerializer(many=True, required=True, source='ingredient_recipe')
     text = serializers.CharField(source='description')
+    #image = Base64ImageField(required=True, allow_null=False)
 
     class Meta:
         """Describe settings for RecipeSerializer."""
@@ -154,7 +161,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         fields = (
             'ingredients',
             'tags',
-            # 'image',
+            #'image',
             'name',
             'text',
             'cooking_time',
@@ -163,17 +170,16 @@ class PostRecipeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Define a way how Recipe instance is create."""
 
-        ingredients = validated_data.pop('ingredients')
+        ingredients = validated_data.pop('ingredient_recipe')
         tags = validated_data.pop('tags')
 
         recipe = Recipe.objects.create(**validated_data)
 
         for ingredient in ingredients:
-            current_ingredient = get_object_or_404(Ingredient, id=ingredient['id'])
             IngredientRecipe.objects.get_or_create(
-                ingredient=current_ingredient,
+                ingredient_id=ingredient['id'],
                 recipe=recipe,
-                quantity=ingredient['quantity']
+                quantity=ingredient['quantity'],
             )
         for tag in tags:
             recipe.tags.add(tag)
