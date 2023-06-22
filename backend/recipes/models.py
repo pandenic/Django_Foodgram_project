@@ -95,14 +95,12 @@ class Recipe(models.Model):
         verbose_name='Ингридиенты',
         help_text='Содержит список ингридиентов',
         through='IngredientRecipe',
-        blank=True,
     )
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Тэги',
         help_text='Содержит список тэгов',
         through='TagRecipe',
-        blank=True,
     )
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления',

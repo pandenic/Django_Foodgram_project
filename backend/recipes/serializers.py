@@ -3,9 +3,8 @@ import base64
 from collections import OrderedDict
 
 from django.core.files.base import ContentFile
-from django.db.models import F
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import Tag, Ingredient, Recipe, Favorite, ShoppingCart, TagRecipe, IngredientRecipe
 from users.serializers import GetUserSerializer
@@ -26,21 +25,10 @@ class TagSerializer(serializers.ModelSerializer):
         )
 
 
-class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
-    def __init__(self, method_name=None, **kwargs):
-        self.method_name = method_name
-        kwargs['source'] = '*'
-        super(serializers.SerializerMethodField, self).__init__(**kwargs)
-
-    def to_internal_value(self, data):
-        return {self.field_name: data}
-
-
 class IngredientSerializer(serializers.ModelSerializer):
     """Serialize requests for Ingredients model."""
 
-    id = serializers.IntegerField(read_only=False)
-    amount = ReadWriteSerializerMethodField(method_name='get_amount')
+    amount = serializers.SerializerMethodField()
 
     class Meta:
         """Describe settings for IngredientSerializer."""
@@ -52,7 +40,6 @@ class IngredientSerializer(serializers.ModelSerializer):
             'measurement_unit',
             'amount',
         )
-        read_only_fields = ('name', 'measurement_unit')
 
     def get_amount(self, obj):
         if 'current_recipe_id' not in self.context:
@@ -63,24 +50,30 @@ class IngredientSerializer(serializers.ModelSerializer):
         )
         return ingredient_recipe.quantity
 
-    def to_representation(self, instance):
-        result = super(IngredientSerializer, self).to_representation(instance)
-        return OrderedDict([(key, result[key]) for key in result if result[key] is not None])
+
+class IngredientRecipeSerializer(serializers.ModelSerializer):
+    """Serialize requests for Ingredients model."""
+
+    id = serializers.IntegerField(read_only=False)
+    amount = serializers.IntegerField(source='quantity')
+
+    class Meta:
+        """Describe settings for IngredientSerializer."""
+
+        model = IngredientRecipe
+        fields = (
+            'id',
+            'amount',
+        )
 
     def validate_amount(self, value):
-        if value['amount'] <= 0 or value['amount'] is None:
+        if value <= 0 or value is None:
             raise serializers.ValidationError('Неверное количество ингредиентов')
         return value
 
-    def create(self, validated_data):
-        if 'amount' not in self.initial_data:
-            raise serializers.ValidationError('No amount in validated date')
-        ingredient_recipe_chain = IngredientRecipe.objects.get_or_create(
-            ingredient_id=validated_data['id'],
-            recipe_id=self.context['current_recipe_id'],
-            quantity=validated_data['amount'],
-        )
-        return ingredient_recipe_chain
+    def validate_id(self, value):
+        get_object_or_404(Ingredient, id=value)
+        return value
 
 
 class Base64ImageField(serializers.ImageField):
@@ -94,18 +87,17 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class GetRecipeSerializer(serializers.ModelSerializer):
     """Serialize GET request for Recipe model."""
 
-    ingredients = serializers.SerializerMethodField()
+    tags = TagSerializer(many=True, read_only=True)
+    ingredients = IngredientSerializer(many=True, read_only=True)
     author = GetUserSerializer(read_only=True)
+    text = serializers.CharField(source='description')
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    text = serializers.CharField(source='description')
 
     class Meta:
-        """Describe settings for RecipeSerializer."""
-
         model = Recipe
         fields = (
             'id',
@@ -115,38 +107,10 @@ class RecipeSerializer(serializers.ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
             'name',
-             #'image',
+            # 'image',
             'text',
             'cooking_time',
         )
-        read_only_fields = (
-            'id',
-            'author',
-            'is_favorited',
-            'is_in_shopping_cart',
-
-        )
-
-    def create(self, validated_data):
-        """Define a way how Recipe instance is create."""
-        is_ingredients_in_data = 'ingredients' in self.initial_data
-        is_tags_in_data = 'tags' in self.initial_data
-
-        if is_tags_in_data:
-            tags = validated_data.pop('tags')
-
-        recipe = Recipe.objects.create(**validated_data)
-
-        if is_ingredients_in_data:
-            ingredients = self.initial_data['ingredients']
-            for ingredient in ingredients:
-                ingredients_serializer = IngredientSerializer(data=ingredient, context={'current_recipe_id': recipe.id})
-                ingredients_serializer.is_valid(raise_exception=True)
-                ingredients_serializer.save()
-        return recipe
-
-    def get_ingredients(self, obj):
-        return IngredientSerializer(obj.ingredients.all(), many=True).data
 
     def get_is_favorited(self, obj):
         """Check if current recipe is in favorite of a user."""
@@ -170,11 +134,17 @@ class RecipeSerializer(serializers.ModelSerializer):
             ).exists()
         return False
 
-'''
-class PostRecipeSerializer(serializers.ModelSerializer):
-    """Serialize GET request for Recipe model."""
 
-    # image = Base64ImageField(required=True)
+class PostRecipeSerializer(serializers.ModelSerializer):
+    """Serialize POST request for Recipe model."""
+
+    tags = serializers.PrimaryKeyRelatedField(
+        read_only=False,
+        required=True,
+        many=True,
+        queryset=Tag.objects.all()
+    )
+    ingredients = IngredientRecipeSerializer(many=True, required=True)
     text = serializers.CharField(source='description')
 
     class Meta:
@@ -189,45 +159,24 @@ class PostRecipeSerializer(serializers.ModelSerializer):
             'text',
             'cooking_time',
         )
-        read_only_fields = ('author',)
 
     def create(self, validated_data):
         """Define a way how Recipe instance is create."""
-        is_ingredients_in_data = 'ingredients' in self.initial_data
-        is_tags_in_data = 'tags' in self.initial_data
 
-        if is_ingredients_in_data:
-            ingredients = validated_data.pop('ingredients')
-        if is_tags_in_data:
-            tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
 
         recipe = Recipe.objects.create(**validated_data)
 
-        if is_ingredients_in_data:
-            for ingredient in ingredients:
-                current_ingredient = Ingredient.objects.get(
-                    id=ingredient['id'])
-                if current_ingredient:
-                    IngredientRecipe.objects.get_or_create(
-                        ingredient=current_ingredient,
-                        recipe=recipe,
-                        quantity=ingredient['quantity'],
-                    )
+        for ingredient in ingredients:
+            current_ingredient = get_object_or_404(Ingredient, id=ingredient['id'])
+            IngredientRecipe.objects.get_or_create(
+                ingredient=current_ingredient,
+                recipe=recipe,
+                quantity=ingredient['quantity']
+            )
+        for tag in tags:
+            recipe.tags.add(tag)
         return recipe
 
-    def to_representation(self, instance):
-        """Define representation of PostRecipeSerializer."""
-        representation = GetRecipeSerializer(instance)
-        return representation.data
-'''
-
-
-'''
-        for tag in tags:
-            if Tag.objects.get(tag):
-                TagRecipe.objects.get_or_create(
-                    tag=tag,
-                    recipe=recipe,
-                )
-'''
 
