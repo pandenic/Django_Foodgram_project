@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from recipes.models import Tag, Ingredient, Recipe, Favorite, ShoppingCart, TagRecipe, IngredientRecipe
+from recipes.models import Tag, Ingredient, Recipe, Favorite, ShoppingCart, IngredientRecipe
 from users.serializers import GetUserSerializer
 
 
@@ -167,22 +167,43 @@ class PostRecipeSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
-    def create(self, validated_data):
-        """Define a way how Recipe instance is create."""
-
-        ingredients = validated_data.pop('ingredient_recipe')
-        tags = validated_data.pop('tags')
-
-        recipe = Recipe.objects.create(**validated_data)
-
+    def add_ingredients(self, recipe, ingredients):
         for ingredient in ingredients:
             IngredientRecipe.objects.get_or_create(
                 ingredient_id=ingredient['id'],
                 recipe=recipe,
                 quantity=ingredient['quantity'],
             )
-        for tag in tags:
-            recipe.tags.add(tag)
+
+    def create(self, validated_data):
+        """Define a way how Recipe instance is creating."""
+        ingredients = validated_data.pop('ingredient_recipe')
+        tags = validated_data.pop('tags')
+
+        recipe = Recipe.objects.create(**validated_data)
+
+        self.add_ingredients(
+            recipe=recipe,
+            ingredients=ingredients,
+        )
+        recipe.tags.set(tags)
         return recipe
 
+    def update(self, instance, validated_data):
+        """Define a way how Recipe instance is updating."""
+        instance.name = validated_data.get('name', instance.name)
+        #instance.image = validated_data.get('image', instance.image)
+        instance.description = validated_data.get('description', instance.description)
+        instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
+
+        ingredients = validated_data.pop('ingredient_recipe')
+        tags = validated_data.pop('tags')
+
+        instance.ingredients.clear()
+        self.add_ingredients(
+            recipe=instance,
+            ingredients=ingredients,
+        )
+        instance.tags.set(tags)
+        return instance
 

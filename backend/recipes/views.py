@@ -3,6 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 
+from recipes.filters import RecipeFilter
 from recipes.models import Tag, Recipe, Ingredient
 from recipes.pagination import RecipePagination
 from recipes.serializers import TagSerializer, IngredientSerializer, GetRecipeSerializer, PostRecipeSerializer
@@ -31,9 +32,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     queryset = Recipe.objects.all()
     pagination_class = RecipePagination
-    '''
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('is_favorited', 'is_in_shopping_cart', 'author', 'tags')'''
+    filterset_class = RecipeFilter
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def perform_create(self, serializer):
         """Perform actions during save an instance of user."""
