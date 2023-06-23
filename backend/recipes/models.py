@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator
 from django.db import models
 
 User = get_user_model()
@@ -82,7 +83,8 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name='Фото рецепта',
         help_text='Содержит фото рецепта',
-        upload_to='recipes/media/',
+        upload_to='media/',
+        blank=True,
     )
     description = models.TextField(
         verbose_name='Описание рецепта',
@@ -100,7 +102,7 @@ class Recipe(models.Model):
         help_text='Содержит список тэгов',
         through='TagRecipe',
     )
-    cooking_time = models.DurationField(
+    cooking_time = models.IntegerField(
         verbose_name='Время приготовления',
         help_text='Содержит время приготовления рецепта',
     )
@@ -111,12 +113,6 @@ class Recipe(models.Model):
         ordering = ('name',)
         verbose_name = 'Recipe'
         verbose_name_plural = 'Recipes'
-        constraints = (
-            models.UniqueConstraint(
-                fields=('name', 'author'),
-                name='unique_recipe',
-            ),
-        )
 
     def __str__(self):
         """Show a name of a tag."""
@@ -129,16 +125,17 @@ class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingredients',
+        related_name='recipes',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipes',
+        related_name='ingredient_recipe',
     )
     quantity = models.IntegerField(
         verbose_name='Количество ингридиента',
         help_text='Содержит количество ингридиента',
+        validators=[MinValueValidator(0)],
     )
 
     def __str__(self):
