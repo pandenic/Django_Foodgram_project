@@ -67,7 +67,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
     def validate_amount(self, value):
         if value <= 0 or value is None:
-            raise serializers.ValidationError('Неверное количество ингредиентов')
+            raise serializers.ValidationError({'amount': Errors.WRONG_INGREDIENTS_AMOUNT})
         return value
 
     def validate_id(self, value):
@@ -207,3 +207,15 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         instance.tags.set(tags)
         return instance
 
+
+class FavoriteRecipeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            #'image',
+            'cooking_time',
+        )
