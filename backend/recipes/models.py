@@ -184,6 +184,12 @@ class Favorite(models.Model):
         ordering = ('user', 'favorite_recipe')
         verbose_name = 'Favorite'
         verbose_name_plural = 'Favorites'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('favorite_recipe', 'user'),
+                name='unique_favorite',
+            ),
+        )
 
     def __str__(self):
         """Show a favorite recipe for a certain user."""
@@ -214,6 +220,12 @@ class ShoppingCart(models.Model):
         ordering = ('user', 'recipe_in_cart')
         verbose_name = 'Shopping cart'
         verbose_name_plural = 'Shopping carts'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('recipe_in_cart', 'user'),
+                name='unique_good',
+            ),
+        )
 
     def __str__(self):
         """Show a tag - recipe chain."""
