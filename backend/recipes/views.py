@@ -13,7 +13,6 @@ from recipes.pagination import RecipePagination
 from recipes.serializers import TagSerializer, IngredientSerializer, GetRecipeSerializer, PostRecipeSerializer, \
     FavoriteRecipeSerializer
 
-
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """Perform GET operations for Tag model."""
 
