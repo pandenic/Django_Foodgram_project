@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from recipes.models import Recipe
 from users.models import Follow
 
 User = get_user_model()
@@ -117,9 +118,25 @@ class GetTokenSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
-'''
-class SubscriptionSerializer(GetUserSerializer):
+class SubscriptionRecipeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            #'image',
+            'cooking_time',
+        )
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
     """Serialize subscription process."""
+
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
         """Describe settings for SubscriptionSerializer."""
@@ -135,4 +152,29 @@ class SubscriptionSerializer(GetUserSerializer):
             'recipes',
             'recipes_count',
         )
-'''
+
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return False
+        return Follow.objects.filter(
+            follower=request.user,
+            following=obj,
+        ).exists()
+
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return None
+        limit = request.query_params.get('recipes_limit')
+        limit = int(limit) if limit and limit.isdigit() else 1
+        serializer = SubscriptionRecipeSerializer(
+            Recipe.objects.filter(author=obj)[:limit],
+            many=True,
+        )
+        return serializer.data
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(
+            author=obj,
+        ).count()
