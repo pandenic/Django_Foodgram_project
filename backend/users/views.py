@@ -135,10 +135,10 @@ def get_token(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    token = Token.objects.create(user=user)
+    token, _ = Token.objects.get_or_create(user=user)
 
     return Response(
-        {'auth_token': str(token.key)},
+        {'auth_token': token.key},
         status=status.HTTP_201_CREATED,
     )
 
