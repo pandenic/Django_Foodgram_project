@@ -1,11 +1,8 @@
 """Describe custom views for the recipe app."""
-import io
-
 from django.db.models import Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from reportlab.pdfgen import canvas
 from rest_framework import permissions, viewsets, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response

@@ -126,7 +126,7 @@ class SubscriptionRecipeSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
-            #'image',
+            'image',
             'cooking_time',
         )
 

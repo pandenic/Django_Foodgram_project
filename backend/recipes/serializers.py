@@ -5,6 +5,7 @@ from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
+from recipes.errors import ErrorMessage
 from recipes.models import Tag, Ingredient, Recipe, Favorite, ShoppingCart, IngredientRecipe
 from users.serializers import GetUserSerializer
 
@@ -67,7 +68,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
 
     def validate_amount(self, value):
         if value <= 0 or value is None:
-            raise serializers.ValidationError({'amount': Errors.WRONG_INGREDIENTS_AMOUNT})
+            raise serializers.ValidationError({'amount': ErrorMessage.WRONG_INGREDIENTS_AMOUNT})
         return value
 
     def validate_id(self, value):
@@ -106,7 +107,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
             'name',
-            #'image',
+            'image',
             'text',
             'cooking_time',
         )
@@ -152,7 +153,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
     )
     ingredients = IngredientRecipeSerializer(many=True, required=True, source='ingredient_recipe')
     text = serializers.CharField(source='description')
-    #image = Base64ImageField(required=True, allow_null=False)
+    image = Base64ImageField(required=True, allow_null=False)
 
     class Meta:
         """Describe settings for RecipeSerializer."""
@@ -161,7 +162,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         fields = (
             'ingredients',
             'tags',
-            #'image',
+            'image',
             'name',
             'text',
             'cooking_time',
@@ -192,7 +193,7 @@ class PostRecipeSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Define a way how Recipe instance is updating."""
         instance.name = validated_data.get('name', instance.name)
-        #instance.image = validated_data.get('image', instance.image)
+        instance.image = validated_data.get('image', instance.image)
         instance.description = validated_data.get('description', instance.description)
         instance.cooking_time = validated_data.get('cooking_time', instance.cooking_time)
 
@@ -216,6 +217,6 @@ class FavoriteRecipeSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
-            #'image',
+            'image',
             'cooking_time',
         )
