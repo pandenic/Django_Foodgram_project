@@ -2,12 +2,13 @@
 from rest_framework import mixins, viewsets
 
 
-class ListCreateViewSet(
+class ListCreateRetrieveViewSet(
     mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
     viewsets.GenericViewSet,
 ):
-    """Describe a custom ViewSet for List and Create methods."""
+    """Describe a custom ViewSet for List, Create and Retrieve methods."""
 
     pass
 

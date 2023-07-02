@@ -11,7 +11,7 @@ from rest_framework.response import Response
 
 from recipes.errors import ErrorMessage
 from recipes.views import HTTPMethods
-from users.mixins import ListCreateViewSet, ListViewSet
+from users.mixins import ListCreateRetrieveViewSet, ListViewSet
 from users.models import Follow
 from users.serializers import GetUserSerializer, PostUserSerializer, SetPasswordSerializer, GetTokenSerializer, \
     SubscriptionSerializer
@@ -20,11 +20,10 @@ from users.pagination import UserPagination
 User = get_user_model()
 
 
-class UserViewSet(ListCreateViewSet):
+class UserViewSet(ListCreateRetrieveViewSet):
     """Perform GET and POST operations for User model."""
 
     queryset = User.objects.all()
-    serializer_class = GetUserSerializer
     pagination_class = UserPagination
     permission_classes = (permissions.AllowAny,)
 
@@ -99,6 +98,9 @@ class UserViewSet(ListCreateViewSet):
         if request.method == HTTPMethods.DELETE_UPPER:
             raise serializers.ValidationError({'errors': ErrorMessage.NOTHING_TO_DELETE})
 
+        if request.user == user_to_follow:
+            raise serializers.ValidationError({'errors': ErrorMessage.CANNOT_FOLLOW_YOURSELF})
+
         Follow.objects.create(
             follower=request.user,
             following=user_to_follow,
@@ -113,7 +115,7 @@ class UserViewSet(ListCreateViewSet):
 
     def get_serializer_class(self):
         """Choose serializer class depend on method."""
-        if self.action == 'list':
+        if self.action in ('list', 'retrieve'):
             return GetUserSerializer
         return PostUserSerializer
 
