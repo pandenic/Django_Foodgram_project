@@ -13,6 +13,7 @@ from recipes.errors import ErrorMessage
 from recipes.filters import RecipeFilter, IngredientSearchFilter
 from recipes.models import Tag, Recipe, Ingredient, Favorite, ShoppingCart
 from recipes.pagination import RecipePagination
+from recipes.permissions import AuthorOrReadOnly
 from recipes.serializers import TagSerializer, IngredientSerializer, GetRecipeSerializer, PostRecipeSerializer, \
     FavoriteRecipeSerializer
 
@@ -43,6 +44,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = RecipePagination
     filter_backends = (DjangoFilterBackend,)
+    permission_classes = (AuthorOrReadOnly,)
     filterset_class = RecipeFilter
     http_method_names = [
         HTTPMethods.GET_LOWER,

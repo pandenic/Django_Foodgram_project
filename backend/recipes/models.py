@@ -105,11 +105,16 @@ class Recipe(models.Model):
         verbose_name='Время приготовления',
         help_text='Содержит время приготовления рецепта',
     )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата добавления рецепта',
+        help_text='Содержит дату добавления рецепта',
+    )
 
     class Meta:
         """Used to change a behavior of the Tag model fields."""
 
-        ordering = ('name',)
+        ordering = ('-pub_date', 'name')
         verbose_name = 'Recipe'
         verbose_name_plural = 'Recipes'
 
