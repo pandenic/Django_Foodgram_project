@@ -3,7 +3,8 @@ import base64
 
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
 
 from recipes.errors import ErrorMessage
 from recipes.models import Tag, Ingredient, Recipe, Favorite, ShoppingCart, IngredientRecipe
@@ -115,7 +116,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         """Check if current recipe is in favorite of a user."""
         request = self.context.get('request')
-        if request:
+        if request and request.user.is_authenticated:
             return Favorite.objects.filter(
                 user=request.user,
             ).filter(
@@ -126,7 +127,7 @@ class GetRecipeSerializer(serializers.ModelSerializer):
     def get_is_in_shopping_cart(self, obj):
         """Check if current recipe is in shopping cart of a user."""
         request = self.context.get('request')
-        if request:
+        if request and request.user.is_authenticated:
             return ShoppingCart.objects.filter(
                 user=request.user,
             ).filter(
