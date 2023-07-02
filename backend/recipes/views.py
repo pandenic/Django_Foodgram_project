@@ -3,14 +3,14 @@ from django.db.models import Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions, viewsets, status, serializers
+from rest_framework import permissions, viewsets, status, serializers, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from foodgram.constants import HTTPMethods
 from recipes.converters import convert_tuples_list_to_pdf
 from recipes.errors import ErrorMessage
-from recipes.filters import RecipeFilter
+from recipes.filters import RecipeFilter, IngredientSearchFilter
 from recipes.models import Tag, Recipe, Ingredient, Favorite, ShoppingCart
 from recipes.pagination import RecipePagination
 from recipes.serializers import TagSerializer, IngredientSerializer, GetRecipeSerializer, PostRecipeSerializer, \
@@ -30,9 +30,11 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     """Perform GET operations for Ingredients model."""
 
     queryset = Ingredient.objects.all()
+    filter_backends = (IngredientSearchFilter,)
     serializer_class = IngredientSerializer
     permission_classes = (permissions.AllowAny,)
     pagination_class = None
+    search_fields = ('name',)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
