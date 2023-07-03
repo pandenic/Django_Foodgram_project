@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('recipes', '0012_alter_recipe_options_recipe_pub_date'),
     ]
@@ -12,6 +11,10 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='recipe',
-            options={'ordering': ('-pub_date', 'name'), 'verbose_name': 'Recipe', 'verbose_name_plural': 'Recipes'},
+            options={
+                'ordering': ('-pub_date', 'name'),
+                'verbose_name': 'Recipe',
+                'verbose_name_plural': 'Recipes',
+            },
         ),
     ]

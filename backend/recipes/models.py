@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -233,4 +232,6 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         """Show a tag - recipe chain."""
-        return f'Recipe {self.favorite_recipe} in shopping cart for {self.user}'
+        return (
+            f'Recipe {self.favorite_recipe} in shopping cart for {self.user}'
+        )

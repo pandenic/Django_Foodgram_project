@@ -1,17 +1,14 @@
 """Django settings for foodgram project."""
 import os
-from datetime import timedelta
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-#qxm0v16w7@&vg8b1n6#lb=9y7#p0#@ermd1wot5)ajqn6^oos' # os.getenv('SECRET_KEY')
+SECRET_KEY = 'django-insecure-#qxm0v16w7@&vg8b1n6#lb=9y7#p0#@ermd1wot5)ajqn6^oos'  # os.getenv('SECRET_KEY')
 
-DEBUG = os.getenv(
-    'DEBUG', default=True)
+DEBUG = os.getenv('DEBUG', default=True)
 
-ALLOWED_HOSTS = [os.getenv(
-    'ALLOWED_HOSTS', default='*')]
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', default='*')]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -61,17 +58,13 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.getenv(
-            'DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': os.getenv(
-            'POSTGRES_DB', default='foodgram_postgres'),
-        'USER': os.getenv(
-            'POSTGRES_USER', default='postgres'),
-        'PASSWORD': os.getenv(
-            'POSTGRES_PASSWORD', default='postgres'),
-        'HOST': os.getenv(
-            'DB_HOST', default='localhost'),
-        'PORT': os.getenv(
-            'DB_PORT', default=5432),
+            'DB_ENGINE', default='django.db.backends.postgresql'
+        ),
+        'NAME': os.getenv('POSTGRES_DB', default='foodgram_postgres'),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': os.getenv('DB_HOST', default='localhost'),
+        'PORT': os.getenv('DB_PORT', default=5432),
     }
 }
 

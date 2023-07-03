@@ -21,7 +21,7 @@ class Follow(models.Model):
         verbose_name='Follower',
         help_text='Follower who going to subscribe to author',
         on_delete=models.CASCADE,
-        related_name='followers'
+        related_name='followers',
     )
     following = models.ForeignKey(
         User,
@@ -41,4 +41,3 @@ class Follow(models.Model):
     def __str__(self):
         """Show a follow - follower chain."""
         return f'{self.follower} follow {self.following}'
-

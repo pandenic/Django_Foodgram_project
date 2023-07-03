@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('recipes', '0008_favorite_unique_favorite_shoppingcart_unique_good'),
     ]
@@ -13,6 +12,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='recipe',
             name='image',
-            field=models.ImageField(help_text='Содержит фото рецепта', upload_to='media/', verbose_name='Фото рецепта'),
+            field=models.ImageField(
+                help_text='Содержит фото рецепта',
+                upload_to='media/',
+                verbose_name='Фото рецепта',
+            ),
         ),
     ]

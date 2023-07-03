@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('recipes', '0002_initial'),
     ]
@@ -14,6 +13,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ingredientrecipe',
             name='quantity',
-            field=models.IntegerField(help_text='Содержит количество ингридиента', validators=[django.core.validators.MinValueValidator(0)], verbose_name='Количество ингридиента'),
+            field=models.IntegerField(
+                help_text='Содержит количество ингридиента',
+                validators=[django.core.validators.MinValueValidator(0)],
+                verbose_name='Количество ингридиента',
+            ),
         ),
     ]

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('recipes', '0007_alter_ingredientrecipe_recipe'),
     ]
@@ -12,10 +11,14 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddConstraint(
             model_name='favorite',
-            constraint=models.UniqueConstraint(fields=('favorite_recipe', 'user'), name='unique_favorite'),
+            constraint=models.UniqueConstraint(
+                fields=('favorite_recipe', 'user'), name='unique_favorite'
+            ),
         ),
         migrations.AddConstraint(
             model_name='shoppingcart',
-            constraint=models.UniqueConstraint(fields=('recipe_in_cart', 'user'), name='unique_good'),
+            constraint=models.UniqueConstraint(
+                fields=('recipe_in_cart', 'user'), name='unique_good'
+            ),
         ),
     ]

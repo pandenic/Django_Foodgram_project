@@ -1,7 +1,15 @@
+"""Decribe admin panel settings."""
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
-from recipes.models import Recipe, Tag, Ingredient, Favorite, IngredientRecipe, ShoppingCart
+from recipes.models import (
+    Favorite,
+    Ingredient,
+    IngredientRecipe,
+    Recipe,
+    ShoppingCart,
+    Tag,
+)
 from users.models import Follow
 
 User = get_user_model()
@@ -18,14 +26,14 @@ class UserAdmin(admin.ModelAdmin):
         'last_name',
         'email',
     )
-    search_fields = ('username', )
+    search_fields = ('username',)
     list_filter = ('email', 'username')
     empty_value_display = '-empty-'
 
 
 @admin.register(Follow)
 class FollowAdmin(admin.ModelAdmin):
-    """Follow panel settings for User model."""
+    """Admin panel settings for Follow model."""
 
     list_display = (
         'id',
@@ -39,7 +47,7 @@ class FollowAdmin(admin.ModelAdmin):
 
 @admin.register(Favorite)
 class Favorite(admin.ModelAdmin):
-    """Admin panel settings for Tag model."""
+    """Admin panel settings for Favorite model."""
 
     list_display = (
         'id',
@@ -92,7 +100,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    """Admin panel settings for Tag model."""
+    """Admin panel settings for Ingredient model."""
 
     list_display = (
         'id',
@@ -106,7 +114,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(IngredientRecipe)
 class IngredientRecipeAdmin(admin.ModelAdmin):
-    """Admin panel settings for Tag model."""
+    """Admin panel settings for IngredientRecipe model."""
 
     list_display = (
         'id',
@@ -121,7 +129,7 @@ class IngredientRecipeAdmin(admin.ModelAdmin):
 
 @admin.register(ShoppingCart)
 class ShoppingCart(admin.ModelAdmin):
-    """Admin panel settings for Tag model."""
+    """Admin panel settings for ShoppingCart model."""
 
     list_display = (
         'id',

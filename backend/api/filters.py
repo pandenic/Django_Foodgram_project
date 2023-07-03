@@ -1,4 +1,4 @@
-"""Модуль содержит фильтры для приложения api."""
+"""Describe filters for an Api app."""
 from django.contrib.auth import get_user_model
 from django_filters import rest_framework as df
 from rest_framework import filters
@@ -9,7 +9,7 @@ User = get_user_model()
 
 
 class RecipeFilter(df.FilterSet):
-    """Фильтрует произведения по полям."""
+    """Describe settings of recipe filtration."""
 
     tags = df.ModelMultipleChoiceFilter(
         field_name='tags__slug',
@@ -30,17 +30,22 @@ class RecipeFilter(df.FilterSet):
     )
 
     def filter_user_lists(self, queryset, name, value):
+        """Change behavior of a filter.
+
+        Depend on is_in_shopping_cart query param value.
+        """
         if value:
             return queryset.filter(**{name: self.request.user})
         return queryset.exclude(**{name: self.request.user})
 
     class Meta:
-        """Определяет настройки фильтра TitleFilter."""
+        """Define settings of RecipeFilter."""
 
         model = Recipe
         fields = ['tags', 'author', 'is_favorited', 'is_in_shopping_cart']
 
 
 class IngredientSearchFilter(filters.SearchFilter):
+    """Describe settings of ingredient filtration."""
 
     search_param = 'name'

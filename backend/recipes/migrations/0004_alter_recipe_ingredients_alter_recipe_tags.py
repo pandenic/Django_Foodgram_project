@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('recipes', '0003_alter_ingredientrecipe_quantity'),
     ]
@@ -13,11 +12,21 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='recipe',
             name='ingredients',
-            field=models.ManyToManyField(help_text='Содержит список ингридиентов', through='recipes.IngredientRecipe', to='recipes.ingredient', verbose_name='Ингридиенты'),
+            field=models.ManyToManyField(
+                help_text='Содержит список ингридиентов',
+                through='recipes.IngredientRecipe',
+                to='recipes.ingredient',
+                verbose_name='Ингридиенты',
+            ),
         ),
         migrations.AlterField(
             model_name='recipe',
             name='tags',
-            field=models.ManyToManyField(help_text='Содержит список тэгов', through='recipes.TagRecipe', to='recipes.tag', verbose_name='Тэги'),
+            field=models.ManyToManyField(
+                help_text='Содержит список тэгов',
+                through='recipes.TagRecipe',
+                to='recipes.tag',
+                verbose_name='Тэги',
+            ),
         ),
     ]

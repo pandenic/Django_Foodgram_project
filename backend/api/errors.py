@@ -1,4 +1,8 @@
+"""Describe errors processing."""
+
+
 class ErrorMessage:
+    """Contain errors prompts."""
 
     NOTHING_TO_DELETE = 'Nothing to delete.'
     RECIPE_IN_FAVORITES = 'Recipe is in favorites already.'
