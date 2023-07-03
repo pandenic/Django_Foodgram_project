@@ -9,9 +9,9 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from recipes.errors import ErrorMessage
+from api.errors import ErrorMessage
 from recipes.views import HTTPMethods
-from users.mixins import ListCreateRetrieveViewSet, ListViewSet
+from api.mixins import ListCreateRetrieveViewSet
 from users.models import Follow
 from users.serializers import GetUserSerializer, PostUserSerializer, SetPasswordSerializer, GetTokenSerializer, \
     SubscriptionSerializer

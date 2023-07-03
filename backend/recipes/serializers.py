@@ -3,10 +3,9 @@ import base64
 
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from rest_framework import serializers
 
-from recipes.errors import ErrorMessage
+from api.errors import ErrorMessage
 from recipes.models import Tag, Ingredient, Recipe, Favorite, ShoppingCart, IngredientRecipe
 from users.serializers import GetUserSerializer
 
