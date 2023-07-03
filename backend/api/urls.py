@@ -1,11 +1,26 @@
-"""URL configuration for users app."""
+"""URL configuration for recipes app."""
 from django.urls import path, include
 
 from rest_framework import routers
 
-from users.views import UserViewSet, get_token, delete_token
+from api.views import TagViewSet, IngredientViewSet, RecipeViewSet, UserViewSet, get_token, delete_token
 
 router = routers.SimpleRouter()
+router.register(
+    'tags',
+    TagViewSet,
+    basename='tags',
+)
+router.register(
+    'ingredients',
+    IngredientViewSet,
+    basename='ingredients',
+)
+router.register(
+    'recipes',
+    RecipeViewSet,
+    basename='recipes',
+)
 router.register(
     'users',
     UserViewSet,
