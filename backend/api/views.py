@@ -136,11 +136,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe_in_cart=recipe,
             user=request.user,
         )
-        if request.method.lower == HTTPMethods.DELETE and recipe_in_shopping_cart:
+        if (request.method.lower == HTTPMethods.DELETE
+                and recipe_in_shopping_cart
+        ):
             recipe_in_shopping_cart.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        if request.method.lower == HTTPMethods.POST and recipe_in_shopping_cart:
+        if (request.method.lower == HTTPMethods.POST
+                and recipe_in_shopping_cart
+        ):
             raise serializers.ValidationError(
                 {'errors': ErrorMessage.ALREADY_IN_SHOPPING_CART}
             )
@@ -249,11 +253,15 @@ class UserViewSet(ListCreateRetrieveViewSet):
             following=user_to_follow,
         )
 
-        if request.method.lower == HTTPMethods.DELETE and follower_following_chain:
+        if (request.method.lower == HTTPMethods.DELETE
+                and follower_following_chain
+        ):
             follower_following_chain.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        if request.method.lower == HTTPMethods.POST and follower_following_chain:
+        if (request.method.lower == HTTPMethods.POST
+                and follower_following_chain
+        ):
             raise serializers.ValidationError(
                 {'errors': ErrorMessage.ALREADY_SUBSCRIBED}
             )
