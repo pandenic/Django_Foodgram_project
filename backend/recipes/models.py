@@ -1,34 +1,33 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator
 from django.db import models
 
 User = get_user_model()
 
 
-class Ingridient(models.Model):
-    """Describe a model which stores information about ingridients."""
+class Ingredient(models.Model):
+    """Describe a model which stores information about ingredients."""
 
     name = models.CharField(
         verbose_name='Название ингридиента',
         help_text='Содержит название ингридиента (макс 150 символов)',
-        unique=True,
         max_length=150,
     )
-    measure = models.CharField(
+    measurement_unit = models.CharField(
         verbose_name='Единицы измерения ингридиента',
         help_text='Содержит единицы измерения ингридиента (макс 50 символов)',
         max_length=50,
     )
 
     class Meta:
-        """Used to change a behavior of the Ingridient model fields."""
+        """Used to change a behavior of the Ingredient model fields."""
 
-        ordering = ('name', 'measure')
-        verbose_name = 'Ingridient'
-        verbose_name_plural = 'Ingridients'
+        ordering = ('name', 'measurement_unit')
+        verbose_name = 'Ingredient'
+        verbose_name_plural = 'Ingredients'
 
     def __str__(self):
-        """Show a name of an ingridient."""
+        """Show a name of an ingredient."""
         return self.name
 
 
@@ -83,17 +82,17 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name='Фото рецепта',
         help_text='Содержит фото рецепта',
-        upload_to='recipes/media/',
+        upload_to='media/',
     )
     description = models.TextField(
         verbose_name='Описание рецепта',
         help_text='Содержит описание рецепта',
     )
-    ingridients = models.ManyToManyField(
-        Ingridient,
+    ingredients = models.ManyToManyField(
+        Ingredient,
         verbose_name='Ингридиенты',
         help_text='Содержит список ингридиентов',
-        through='IngridientRecipe',
+        through='IngredientRecipe',
     )
     tags = models.ManyToManyField(
         Tag,
@@ -101,50 +100,50 @@ class Recipe(models.Model):
         help_text='Содержит список тэгов',
         through='TagRecipe',
     )
-    cooking_time = models.DurationField(
+    cooking_time = models.IntegerField(
         verbose_name='Время приготовления',
         help_text='Содержит время приготовления рецепта',
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата добавления рецепта',
+        help_text='Содержит дату добавления рецепта',
     )
 
     class Meta:
         """Used to change a behavior of the Tag model fields."""
 
-        ordering = ('name',)
+        ordering = ('-pub_date', 'name')
         verbose_name = 'Recipe'
         verbose_name_plural = 'Recipes'
-        constraints = (
-            models.UniqueConstraint(
-                fields=('name', 'author'),
-                name='unique_recipe',
-            ),
-        )
 
     def __str__(self):
         """Show a name of a tag."""
         return self.name
 
 
-class IngridientRecipe(models.Model):
-    """Describe a model which stores ingridient - recipe connection."""
+class IngredientRecipe(models.Model):
+    """Describe a model which stores ingredient - recipe connection."""
 
-    ingridient = models.ForeignKey(
-        Ingridient,
+    ingredient = models.ForeignKey(
+        Ingredient,
         on_delete=models.CASCADE,
-        related_name='ingridients',
+        related_name='recipes',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipes',
+        related_name='ingredient_recipe',
     )
     quantity = models.IntegerField(
         verbose_name='Количество ингридиента',
         help_text='Содержит количество ингридиента',
+        validators=[MinValueValidator(0)],
     )
 
     def __str__(self):
-        """Show a ingridient - recipe chain."""
-        return f'{self.ingridient} {self.recipe}'
+        """Show a ingredient - recipe chain."""
+        return f'{self.ingredient} {self.recipe}'
 
 
 class TagRecipe(models.Model):
@@ -164,20 +163,75 @@ class TagRecipe(models.Model):
         return f'{self.tag} {self.recipe}'
 
 
-class Follow(models.Model):
-    """Describe a model which stores follow - follower connection."""
+class Favorite(models.Model):
+    """Describe a model which stores favorited recipes for a certain user."""
 
-    follower = models.ForeignKey(
-        User,
-        verbose_name='Follower',
-        help_text='Follower who going to subscribe to author',
+    favorite_recipe = models.ForeignKey(
+        Recipe,
+        verbose_name='Favorite recipe',
+        help_text='Recipe which favorited by a certain user',
         on_delete=models.CASCADE,
-        related_name='followers'
+        related_name='favorited_by',
     )
-    following = models.ForeignKey(
+    user = models.ForeignKey(
         User,
-        verbose_name='Following',
-        help_text='Following who is followed by follower',
+        verbose_name='User',
+        help_text='User who favorited a recipe',
         on_delete=models.CASCADE,
-        related_name='followings',
+        related_name='favorites',
     )
+
+    class Meta:
+        """Used to change a behavior of the Favorite model fields."""
+
+        ordering = ('user', 'favorite_recipe')
+        verbose_name = 'Favorite'
+        verbose_name_plural = 'Favorites'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('favorite_recipe', 'user'),
+                name='unique_favorite',
+            ),
+        )
+
+    def __str__(self):
+        """Show a favorite recipe for a certain user."""
+        return f'Recipe {self.favorite_recipe} favorited by {self.user}'
+
+
+class ShoppingCart(models.Model):
+    """Describe a model which stores favorited recipes for a certain user."""
+
+    recipe_in_cart = models.ForeignKey(
+        Recipe,
+        verbose_name='Recipe in cart',
+        help_text='Recipe which added to cart by a certain user',
+        on_delete=models.CASCADE,
+        related_name='added_to_cart',
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name='User',
+        help_text='User who added recipes to a cart',
+        on_delete=models.CASCADE,
+        related_name='cart',
+    )
+
+    class Meta:
+        """Used to change a behavior of the ShoppingCart model fields."""
+
+        ordering = ('user', 'recipe_in_cart')
+        verbose_name = 'Shopping cart'
+        verbose_name_plural = 'Shopping carts'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('recipe_in_cart', 'user'),
+                name='unique_good',
+            ),
+        )
+
+    def __str__(self):
+        """Show a tag - recipe chain."""
+        return (
+            f'Recipe {self.favorite_recipe} in shopping cart for {self.user}'
+        )
