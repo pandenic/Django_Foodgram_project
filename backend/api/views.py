@@ -104,12 +104,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         if request.method.lower == HTTPMethods.POST and favorite_chain:
             raise serializers.ValidationError(
-                {'errors': ErrorMessage.RECIPE_IN_FAVORITES}
+                {'errors': ErrorMessage.RECIPE_IN_FAVORITES},
             )
 
         if request.method.lower == HTTPMethods.DELETE:
             raise serializers.ValidationError(
-                {'errors': ErrorMessage.NOTHING_TO_DELETE}
+                {'errors': ErrorMessage.NOTHING_TO_DELETE},
             )
 
         Favorite.objects.create(
@@ -137,21 +137,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
             user=request.user,
         )
         if (request.method.lower == HTTPMethods.DELETE
-                and recipe_in_shopping_cart
-        ):
+                and recipe_in_shopping_cart):
             recipe_in_shopping_cart.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         if (request.method.lower == HTTPMethods.POST
-                and recipe_in_shopping_cart
-        ):
+                and recipe_in_shopping_cart):
             raise serializers.ValidationError(
-                {'errors': ErrorMessage.ALREADY_IN_SHOPPING_CART}
+                {'errors': ErrorMessage.ALREADY_IN_SHOPPING_CART},
             )
 
         if request.method.lower == HTTPMethods.DELETE:
             raise serializers.ValidationError(
-                {'errors': ErrorMessage.NOTHING_TO_DELETE}
+                {'errors': ErrorMessage.NOTHING_TO_DELETE},
             )
 
         ShoppingCart.objects.create(
@@ -177,13 +175,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             amount=Sum('recipes__recipe__ingredient_recipe__quantity'),
         )
         ingredients = ingredients.values_list(
-            'name', 'amount', 'measurement_unit'
+            'name', 'amount', 'measurement_unit',
         )
         pdf_ingredients = convert_tuples_list_to_pdf(
-            ingredients, 'Ingredients'
+            ingredients, 'Ingredients',
         )
         return FileResponse(
-            pdf_ingredients, as_attachment=True, filename="shopping_cart.pdf"
+            pdf_ingredients, as_attachment=True, filename="shopping_cart.pdf",
         )
 
 
@@ -218,7 +216,7 @@ class UserViewSet(ListCreateRetrieveViewSet):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save(
-            password=make_password(serializer.validated_data['new_password'])
+            password=make_password(serializer.validated_data['new_password']),
         )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -254,26 +252,24 @@ class UserViewSet(ListCreateRetrieveViewSet):
         )
 
         if (request.method.lower == HTTPMethods.DELETE
-                and follower_following_chain
-        ):
+                and follower_following_chain):
             follower_following_chain.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         if (request.method.lower == HTTPMethods.POST
-                and follower_following_chain
-        ):
+                and follower_following_chain):
             raise serializers.ValidationError(
-                {'errors': ErrorMessage.ALREADY_SUBSCRIBED}
+                {'errors': ErrorMessage.ALREADY_SUBSCRIBED},
             )
 
         if request.method.lower == HTTPMethods.DELETE:
             raise serializers.ValidationError(
-                {'errors': ErrorMessage.NOTHING_TO_DELETE}
+                {'errors': ErrorMessage.NOTHING_TO_DELETE},
             )
 
         if request.user == user_to_follow:
             raise serializers.ValidationError(
-                {'errors': ErrorMessage.CANNOT_FOLLOW_YOURSELF}
+                {'errors': ErrorMessage.CANNOT_FOLLOW_YOURSELF},
             )
 
         Follow.objects.create(

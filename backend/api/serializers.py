@@ -81,7 +81,7 @@ class IngredientRecipeSerializer(serializers.ModelSerializer):
         """Check if amount greater than or equal to 0."""
         if value <= 0 or value is None:
             raise serializers.ValidationError(
-                {'amount': ErrorMessage.WRONG_INGREDIENTS_AMOUNT}
+                {'amount': ErrorMessage.WRONG_INGREDIENTS_AMOUNT},
             )
         return value
 
@@ -141,6 +141,8 @@ class GetRecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
+        """Describe settings for GetRecipeSerializer."""
+
         model = Recipe
         fields = (
             'id',
@@ -198,10 +200,10 @@ class PostRecipeSerializer(serializers.ModelSerializer):
     """Serialize POST request for Recipe model."""
 
     tags = serializers.PrimaryKeyRelatedField(
-        read_only=False, required=True, many=True, queryset=Tag.objects.all()
+        read_only=False, required=True, many=True, queryset=Tag.objects.all(),
     )
     ingredients = IngredientRecipeSerializer(
-        many=True, required=True, source='ingredient_recipe'
+        many=True, required=True, source='ingredient_recipe',
     )
     text = serializers.CharField(source='description')
     image = Base64ImageField(required=True, allow_null=False)
@@ -247,10 +249,10 @@ class PostRecipeSerializer(serializers.ModelSerializer):
         instance.name = validated_data.get('name', instance.name)
         instance.image = validated_data.get('image', instance.image)
         instance.description = validated_data.get(
-            'description', instance.description
+            'description', instance.description,
         )
         instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
+            'cooking_time', instance.cooking_time,
         )
 
         ingredients = validated_data.pop('ingredient_recipe')
@@ -342,7 +344,7 @@ class SetPasswordSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if not check_password(value, user.password):
             raise serializers.ValidationError(
-                {'current_password': 'Пароль неверный'}
+                {'current_password': 'Пароль неверный'},
             )
         return value
 

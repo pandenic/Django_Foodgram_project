@@ -1,3 +1,4 @@
+"""Describe models of an Users app."""
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 

@@ -13,7 +13,6 @@ from rest_framework import serializers
 
 def convert_tuples_list_to_pdf(list_of_tuples_to_convert, title=None):
     """Perform converting from tuple to strings in pdf."""
-
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4, bottomup=0)
     pdfmetrics.registerFont(TTFont('Ubuntu', 'Ubuntu-R.ttf'))
@@ -40,7 +39,13 @@ def convert_tuples_list_to_pdf(list_of_tuples_to_convert, title=None):
 
 
 class Base64ImageField(serializers.ImageField):
+    """Perform converting images to base64 format."""
+
     def to_internal_value(self, data):
+        """Change behavior of a function.
+
+        When using converter to internal value.
+        """
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
             ext = format.split('/')[-1]
