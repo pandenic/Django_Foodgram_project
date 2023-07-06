@@ -2,14 +2,8 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from api.views import (
-    IngredientViewSet,
-    RecipeViewSet,
-    TagViewSet,
-    UserViewSet,
-    delete_token,
-    get_token,
-)
+from api.views import (IngredientViewSet, RecipeViewSet, TagViewSet,
+                       UserViewSet, delete_token, get_token)
 
 router = routers.SimpleRouter()
 router.register(

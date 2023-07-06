@@ -11,25 +11,18 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from api.constants import HTTPMethods
+from api.constants import ErrorMessage, HTTPMethods
 from api.converters import convert_tuples_list_to_pdf
-from api.errors import ErrorMessage
 from api.filters import IngredientSearchFilter, RecipeFilter
 from api.mixins import ListCreateRetrieveViewSet
 from api.pagination import LimitPagination
 from api.permissions import AuthorOrReadOnly
-from api.serializers import (
-    FavoriteRecipeSerializer,
-    GetRecipeSerializer,
-    GetTokenSerializer,
-    GetUserSerializer,
-    IngredientSerializer,
-    PostRecipeSerializer,
-    PostUserSerializer,
-    SetPasswordSerializer,
-    SubscriptionSerializer,
-    TagSerializer,
-)
+from api.serializers import (FavoriteRecipeSerializer, GetRecipeSerializer,
+                             GetTokenSerializer, GetUserSerializer,
+                             IngredientSerializer, PostRecipeSerializer,
+                             PostUserSerializer, SetPasswordSerializer,
+                             SubscriptionSerializer, TagSerializer)
+from foodgram.settings import PDF_FILE_NAME_SHOPPING_CART
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from users.models import Follow
 
@@ -84,10 +77,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return PostRecipeSerializer
 
     @action(
-        methods=[
-            HTTPMethods.POST,
-            HTTPMethods.DELETE,
-        ],
+        (HTTPMethods.POST, HTTPMethods.DELETE),
         detail=True,
     )
     def favorite(self, request, pk=None):
@@ -98,16 +88,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
             favorite_recipe=recipe,
             user=request.user,
         )
-        if request.method.lower == HTTPMethods.DELETE and favorite_chain:
+        if (
+            request.method.lower() == HTTPMethods.DELETE
+            and favorite_chain.exists()
+        ):
             favorite_chain.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        if request.method.lower == HTTPMethods.POST and favorite_chain:
+        if (
+            request.method.lower() == HTTPMethods.POST
+            and favorite_chain.exists()
+        ):
             raise serializers.ValidationError(
                 {'errors': ErrorMessage.RECIPE_IN_FAVORITES},
             )
 
-        if request.method.lower == HTTPMethods.DELETE:
+        if request.method.lower() == HTTPMethods.DELETE:
             raise serializers.ValidationError(
                 {'errors': ErrorMessage.NOTHING_TO_DELETE},
             )
@@ -122,10 +118,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
     @action(
-        methods=[
-            HTTPMethods.POST,
-            HTTPMethods.DELETE,
-        ],
+        (HTTPMethods.POST, HTTPMethods.DELETE),
         detail=True,
     )
     def shopping_cart(self, request, pk=None):
@@ -136,18 +129,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe_in_cart=recipe,
             user=request.user,
         )
-        if (request.method.lower == HTTPMethods.DELETE
-                and recipe_in_shopping_cart):
+        if (
+            request.method.lower() == HTTPMethods.DELETE
+            and recipe_in_shopping_cart.exists()
+        ):
             recipe_in_shopping_cart.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        if (request.method.lower == HTTPMethods.POST
-                and recipe_in_shopping_cart):
+        if (
+            request.method.lower() == HTTPMethods.POST
+            and recipe_in_shopping_cart.exists()
+        ):
             raise serializers.ValidationError(
                 {'errors': ErrorMessage.ALREADY_IN_SHOPPING_CART},
             )
 
-        if request.method.lower == HTTPMethods.DELETE:
+        if request.method.lower() == HTTPMethods.DELETE:
             raise serializers.ValidationError(
                 {'errors': ErrorMessage.NOTHING_TO_DELETE},
             )
@@ -162,9 +159,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
     @action(
-        methods=[
-            HTTPMethods.GET,
-        ],
+        (HTTPMethods.GET,),
         detail=False,
     )
     def download_shopping_cart(self, request):
@@ -175,13 +170,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
             amount=Sum('recipes__recipe__ingredient_recipe__quantity'),
         )
         ingredients = ingredients.values_list(
-            'name', 'amount', 'measurement_unit',
+            'name',
+            'amount',
+            'measurement_unit',
         )
         pdf_ingredients = convert_tuples_list_to_pdf(
-            ingredients, 'Ingredients',
+            ingredients,
+            'Ingredients',
         )
         return FileResponse(
-            pdf_ingredients, as_attachment=True, filename="shopping_cart.pdf",
+            pdf_ingredients,
+            as_attachment=True,
+            filename=PDF_FILE_NAME_SHOPPING_CART,
         )
 
 
@@ -199,7 +199,9 @@ class UserViewSet(ListCreateRetrieveViewSet):
     )
     def me(self, request):
         """Process './me' endpoint."""
-        serializer = GetUserSerializer(request.user)
+        serializer = GetUserSerializer(
+            request.user, context={'request': request},
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
@@ -218,7 +220,6 @@ class UserViewSet(ListCreateRetrieveViewSet):
         serializer.save(
             password=make_password(serializer.validated_data['new_password']),
         )
-
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
@@ -251,18 +252,22 @@ class UserViewSet(ListCreateRetrieveViewSet):
             following=user_to_follow,
         )
 
-        if (request.method.lower == HTTPMethods.DELETE
-                and follower_following_chain):
+        if (
+            request.method.lower() == HTTPMethods.DELETE
+            and follower_following_chain.exists()
+        ):
             follower_following_chain.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-        if (request.method.lower == HTTPMethods.POST
-                and follower_following_chain):
+        if (
+            request.method.lower() == HTTPMethods.POST
+            and follower_following_chain.exists()
+        ):
             raise serializers.ValidationError(
                 {'errors': ErrorMessage.ALREADY_SUBSCRIBED},
             )
 
-        if request.method.lower == HTTPMethods.DELETE:
+        if request.method.lower() == HTTPMethods.DELETE:
             raise serializers.ValidationError(
                 {'errors': ErrorMessage.NOTHING_TO_DELETE},
             )
@@ -294,7 +299,7 @@ class UserViewSet(ListCreateRetrieveViewSet):
         return PostUserSerializer
 
 
-@api_view(('POST',))
+@api_view((HTTPMethods.POST,))
 @permission_classes((AllowAny,))
 def get_token(request):
     """Obtain token for a user."""
@@ -319,7 +324,7 @@ def get_token(request):
     )
 
 
-@api_view(('POST',))
+@api_view((HTTPMethods.POST,))
 @permission_classes((permissions.IsAuthenticated,))
 def delete_token(request):
     """Delete token for a user."""

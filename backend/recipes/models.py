@@ -1,7 +1,10 @@
 """Describe models of a Recipe app."""
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core import validators
 from django.db import models
+
+from foodgram.settings import (MAXIMUM_COOKING_TIME, MAXIMUM_INGREDIENT_AMOUNT,
+                               MINIMUM_COOKING_TIME, MINIMUM_INGREDIENT_AMOUNT)
 
 User = get_user_model()
 
@@ -21,7 +24,7 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        """Used to change a behavior of the Ingredient model fields."""
+        """Describe settings for the Ingredient model."""
 
         ordering = ('name', 'measurement_unit')
         verbose_name = 'Ingredient'
@@ -45,6 +48,7 @@ class Tag(models.Model):
         verbose_name='Цвет тэга',
         help_text='Содержит цвет тэга в HEX формате',
         max_length=7,
+        validators=(validators.RegexValidator(regex='^#[0-9a-fA-F]{6}$'),),
     )
     slug = models.SlugField(
         verbose_name='Тексты ссылки тэга',
@@ -54,7 +58,7 @@ class Tag(models.Model):
     )
 
     class Meta:
-        """Used to change a behavior of the Tag model fields."""
+        """Describe settings for the Tag model."""
 
         ordering = ('name',)
         verbose_name = 'Tag'
@@ -101,9 +105,13 @@ class Recipe(models.Model):
         help_text='Содержит список тэгов',
         through='TagRecipe',
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления',
         help_text='Содержит время приготовления рецепта',
+        validators=(
+            validators.MinValueValidator(MINIMUM_COOKING_TIME),
+            validators.MaxValueValidator(MAXIMUM_COOKING_TIME),
+        ),
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -112,7 +120,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        """Used to change a behavior of the Tag model fields."""
+        """Describe settings for the Recipe model."""
 
         ordering = ('-pub_date', 'name')
         verbose_name = 'Recipe'
@@ -136,15 +144,28 @@ class IngredientRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='ingredient_recipe',
     )
-    quantity = models.IntegerField(
+    quantity = models.PositiveSmallIntegerField(
         verbose_name='Количество ингридиента',
         help_text='Содержит количество ингридиента',
-        validators=[MinValueValidator(0)],
+        validators=(
+            validators.MinValueValidator(MINIMUM_INGREDIENT_AMOUNT),
+            validators.MaxValueValidator(MAXIMUM_INGREDIENT_AMOUNT),
+        ),
     )
 
     def __str__(self):
         """Show a ingredient - recipe chain."""
         return f'{self.ingredient} {self.recipe}'
+
+    class Meta:
+        """Describe settings for the IngredientRecipe model."""
+
+        constraints = (
+            models.UniqueConstraint(
+                fields=('ingredient', 'recipe'),
+                name="unique_ingredient_in_recipe",
+            ),
+        )
 
 
 class TagRecipe(models.Model):
@@ -183,7 +204,7 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        """Used to change a behavior of the Favorite model fields."""
+        """Describe settings for the Favorite model."""
 
         ordering = ('user', 'favorite_recipe')
         verbose_name = 'Favorite'
@@ -219,7 +240,7 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
-        """Used to change a behavior of the ShoppingCart model fields."""
+        """Describe settings for the ShoppingCart model."""
 
         ordering = ('user', 'recipe_in_cart')
         verbose_name = 'Shopping cart'

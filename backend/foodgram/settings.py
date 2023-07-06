@@ -2,13 +2,20 @@
 import os
 from pathlib import Path
 
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+# sfrom dotenv import load_dotenv
+
+# load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-#qxm0v16w7@&vg8b1n6#lb=9y7#p0#@ermd1wot5)ajqn6^oos'  # os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = os.getenv('DEBUG', default=True)
+DEBUG = os.getenv('DEBUG', default='false').lower() in ('true', '1')
 
-ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', default='*')]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split()
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -58,7 +65,8 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.getenv(
-            'DB_ENGINE', default='django.db.backends.postgresql',
+            'DB_ENGINE',
+            default='django.db.backends.postgresql',
         ),
         'NAME': os.getenv('POSTGRES_DB', default='foodgram_postgres'),
         'USER': os.getenv('POSTGRES_USER', default='postgres'),
@@ -108,3 +116,22 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
 }
+
+
+class PDFFonts:
+    """Describe fonts' names."""
+
+    UBUNTU = 'Ubuntu'
+    UBUNTU_BOLD = 'Ubuntu_B'
+
+
+pdfmetrics.registerFont(TTFont(PDFFonts.UBUNTU, 'Ubuntu-R.ttf'))
+pdfmetrics.registerFont(TTFont(PDFFonts.UBUNTU_BOLD, 'Ubuntu-B.ttf'))
+
+PDF_FILE_NAME_SHOPPING_CART = 'shopping_cart.pdf'
+
+MINIMUM_INGREDIENT_AMOUNT = 1
+MINIMUM_COOKING_TIME = 1
+
+MAXIMUM_INGREDIENT_AMOUNT = 32767
+MAXIMUM_COOKING_TIME = 32767
