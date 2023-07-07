@@ -30,7 +30,7 @@ services:
   nginx:
     image: nginx:1.25.0
     ports:
-      - "8000:80"
+      - 8000:80
     volumes:
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static:/usr/share/nginx/html/staticfiles/
