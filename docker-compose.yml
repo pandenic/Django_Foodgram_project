@@ -30,7 +30,7 @@ services:
   nginx:
     image: pandenic/foodgram_nginx
     ports:
-      - 8000:8000
+      - 8000:80
     volumes:
       - static:/usr/share/nginx/html/staticfiles/
       - media:/usr/share/nginx/html/media/
