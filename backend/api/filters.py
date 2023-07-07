@@ -42,7 +42,7 @@ class RecipeFilter(df.FilterSet):
         """Define settings of RecipeFilter."""
 
         model = Recipe
-        fields = ['tags', 'author', 'is_favorited', 'is_in_shopping_cart']
+        fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart')
 
 
 class IngredientSearchFilter(filters.SearchFilter):

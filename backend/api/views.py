@@ -57,12 +57,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (AuthorOrReadOnly,)
     filterset_class = RecipeFilter
-    http_method_names = [
+    http_method_names = (
         HTTPMethods.GET,
         HTTPMethods.POST,
         HTTPMethods.PATCH,
         HTTPMethods.DELETE,
-    ]
+    )
 
     def perform_create(self, serializer):
         """Perform actions during save an instance of a user."""

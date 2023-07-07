@@ -131,11 +131,8 @@ class GetUserSerializer(serializers.ModelSerializer):
         return (
             Follow.objects.filter(
                 follower=user,
-            )
-            .filter(
                 following=obj,
-            )
-            .exists()
+            ).exists()
         )
 
 
@@ -458,7 +455,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         limit = request.query_params.get('recipes_limit')
         limit = int(limit) if limit and limit.isdigit() else 1
         serializer = FavoriteRecipeSerializer(
-            Recipe.objects.filter(author=obj)[:limit],
+            obj.recipes.all()[:limit],
             many=True,
         )
         return serializer.data
