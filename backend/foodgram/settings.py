@@ -17,6 +17,8 @@ DEBUG = os.getenv('DEBUG', default='false').lower() in ('true', '1')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='*').split()
 CSRF_TRUSTED_ORIGINS = os.getenv('ALLOWED_HOSTS', default='*').split()
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
