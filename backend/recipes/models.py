@@ -13,13 +13,13 @@ class Ingredient(models.Model):
     """Describe a model which stores information about ingredients."""
 
     name = models.CharField(
-        verbose_name='Название ингридиента',
-        help_text='Содержит название ингридиента (макс 150 символов)',
+        verbose_name='Ingredient name',
+        help_text='Contains ingredient name (max 150 char)',
         max_length=150,
     )
     measurement_unit = models.CharField(
-        verbose_name='Единицы измерения ингридиента',
-        help_text='Содержит единицы измерения ингридиента (макс 50 символов)',
+        verbose_name='Ingredient measurement unit',
+        help_text='Contains measurement unit of an ingredient (max 50 char)',
         max_length=50,
     )
 
@@ -39,20 +39,20 @@ class Tag(models.Model):
     """Describe a model which stores tags for recipes."""
 
     name = models.CharField(
-        verbose_name='Название тэга',
-        help_text='Содержит название тэга (макс 150 символов)',
+        verbose_name='Tag name',
+        help_text='Contains tag name (max 150 char)',
         unique=True,
         max_length=150,
     )
     color = models.CharField(
-        verbose_name='Цвет тэга',
-        help_text='Содержит цвет тэга в HEX формате',
+        verbose_name='Tag color',
+        help_text='Contains tag color in HEX',
         max_length=7,
         validators=(validators.RegexValidator(regex='^#[0-9a-fA-F]{6}$'),),
     )
     slug = models.SlugField(
-        verbose_name='Тексты ссылки тэга',
-        help_text='Содержит короткий текст для доступа к тэгу через url',
+        verbose_name='Tag slug',
+        help_text='Contains tag slug for url (max 50 char)',
         unique=True,
         max_length=50,
     )
@@ -74,40 +74,40 @@ class Recipe(models.Model):
 
     author = models.ForeignKey(
         User,
-        verbose_name='Автор рецепта',
-        help_text='Содержит ссылку на автора рецепта',
+        verbose_name='Recipe author',
+        help_text='Contains link on recipe author',
         related_name='recipes',
         on_delete=models.CASCADE,
     )
     name = models.CharField(
-        verbose_name='Название рецепта',
-        help_text='Содержит название рецепта (макс 150 символов)',
+        verbose_name='Recipe name',
+        help_text='Contains a name of a recipe (max 150 char)',
         max_length=150,
     )
     image = models.ImageField(
-        verbose_name='Фото рецепта',
-        help_text='Содержит фото рецепта',
+        verbose_name='Recipe photo',
+        help_text='Contains recipe photo',
         upload_to='media/',
     )
     description = models.TextField(
-        verbose_name='Описание рецепта',
-        help_text='Содержит описание рецепта',
+        verbose_name='Recipe description',
+        help_text='Contains recipe description',
     )
     ingredients = models.ManyToManyField(
         Ingredient,
-        verbose_name='Ингридиенты',
-        help_text='Содержит список ингридиентов',
+        verbose_name='Ingrenient list',
+        help_text='Contains a list of ingredients',
         through='IngredientRecipe',
     )
     tags = models.ManyToManyField(
         Tag,
-        verbose_name='Тэги',
-        help_text='Содержит список тэгов',
+        verbose_name='Tags list',
+        help_text='Contains a list of tags',
         through='TagRecipe',
     )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления',
-        help_text='Содержит время приготовления рецепта',
+        verbose_name='Preparation time',
+        help_text='Contains recipe preparation time',
         validators=(
             validators.MinValueValidator(MINIMUM_COOKING_TIME),
             validators.MaxValueValidator(MAXIMUM_COOKING_TIME),
@@ -115,8 +115,8 @@ class Recipe(models.Model):
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Дата добавления рецепта',
-        help_text='Содержит дату добавления рецепта',
+        verbose_name='Date added',
+        help_text='Contains date when recipe was added',
     )
 
     class Meta:
@@ -145,8 +145,8 @@ class IngredientRecipe(models.Model):
         related_name='ingredient_recipe',
     )
     quantity = models.PositiveSmallIntegerField(
-        verbose_name='Количество ингридиента',
-        help_text='Содержит количество ингридиента',
+        verbose_name='Ingredients quantity',
+        help_text='Contains ingredients quantity',
         validators=(
             validators.MinValueValidator(MINIMUM_INGREDIENT_AMOUNT),
             validators.MaxValueValidator(MAXIMUM_INGREDIENT_AMOUNT),
@@ -255,5 +255,5 @@ class ShoppingCart(models.Model):
     def __str__(self):
         """Show a tag - recipe chain."""
         return (
-            f'Recipe {self.favorite_recipe} in shopping cart for {self.user}'
+            f'Recipe {self.recipe_in_cart} in shopping cart for {self.user}'
         )
