@@ -1,7 +1,6 @@
 """Decribe admin panel settings."""
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.db import transaction
 
 from recipes.models import (Favorite, Ingredient, IngredientRecipe, Recipe,
                             ShoppingCart, Tag, TagRecipe)
@@ -139,11 +138,15 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def ingredient_list(self, obj):
         """Collect all ingredients and return a string of them."""
-        return ' | '.join([ingredient.name for ingredient in obj.ingredients.all()])
+        return ' | '.join(
+            [ingredient.name for ingredient in obj.ingredients.all()],
+        )
 
     def tag_list(self, obj):
         """Collect all tags and return a string of them."""
-        return ' | '.join([tag.name for tag in obj.tags.all()])
+        return ' | '.join(
+            [tag.name for tag in obj.tags.all()],
+        )
 
 
 @admin.register(Tag)
@@ -192,7 +195,7 @@ class IngredientRecipeAdmin(admin.ModelAdmin):
         'recipe__author__username',
         'recipe__author__email',
         'ingredient__name',
-        'recipe__name'
+        'recipe__name',
     )
     list_filter = ('recipe__tags',)
     empty_value_display = '-empty-'
