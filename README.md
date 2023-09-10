@@ -3,6 +3,16 @@ Service URL: pandenic.ddns.net (accessable for short period until 10 july 2023)
 # Description
 Website "Foodgram". On this service users are able to publish recipes, subscribe to other users' publications, add their favorite recipes to the "Favorites" list, and download a summary of products to buy in a store.
 
+# Technologies
+- Django
+- DRF (Django REST Framework)
+- Docker
+- Docker Compose
+- Gunicorn
+- Nginx
+- CI/CD via GitHub Actions
+- React
+
 # Installation
 
 1. Run backend as a separate api app.
