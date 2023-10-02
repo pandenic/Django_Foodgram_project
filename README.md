@@ -3,8 +3,6 @@ Service URL: pandenic.ddns.net (accessible for a short period until 10 July 2023
 # Description
 Website "Foodgram". On this service, users are able to publish recipes, subscribe to other users' publications, add their favorite recipes to the "Favorites" list, and download a summary of products to buy in a store.
 
-# Technologies
-
 | Technologies | Links |
 | ---- | ---- |
 | ![git_Django](https://github.com/pandenic/Foodgram_project/assets/114985447/87a6dd6e-127f-47e7-bbd4-a6c28fcddf76) | [Django](https://www.djangoproject.com/) |
