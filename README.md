@@ -19,14 +19,14 @@ Website "Foodgram". On this service, users are able to publish recipes, subscrib
 # Installation
 
 
-1. Run the backend as a separate API app.
+1. Run the backend as a separate API app:
 
-Create venv
+Create venv:
 ```bash
 python3.9 -m venv venv
 ```
 
-Install requirements
+Install requirements in the backend folder:
 ```bash
 pip install -r requirements.txt
 ```
