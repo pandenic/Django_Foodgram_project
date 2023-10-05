@@ -57,7 +57,7 @@ DB_PORT=5432
 
 Uncomment strings at the beginning of a "./foodgram/settings.py" file:
 ```python
-sfrom dotenv import load_dotenv
+from dotenv import load_dotenv
 load_dotenv()
 ```
 
