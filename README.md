@@ -21,13 +21,37 @@ Website "Foodgram". On this service, users are able to publish recipes, subscrib
 
 1. Run the backend as a separate API app:
 
-Create venv:
+Clone repository:
+```bash
+git clone
+```
+
+Go to the project directory:
+```
+cd foodgram
+```
+
+Create and activate venv:
+
 ```bash
 python3.9 -m venv venv
 ```
 
+- for Linux/macOS
+
+    ```bash
+    source venv/bin/activate
+    ```
+
+- for windows
+
+    ```bash
+    source venv/scripts/activate
+    ```
+
 Install requirements in the backend folder:
 ```bash
+python3 -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
